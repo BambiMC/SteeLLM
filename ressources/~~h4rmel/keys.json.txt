@@ -1,0 +1,12 @@
+{
+    "openai": {
+        "organization": "",
+        "api_key": ""
+    },
+    "anthropic": {
+        "api_key": ""
+    },
+    "anyscale": {
+        "api_key": "//TODO"
+    }
+}

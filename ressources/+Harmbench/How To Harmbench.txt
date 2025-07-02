@@ -1,0 +1,46 @@
+cd /mnt/hdd-baracuda/fberger
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b	//MANUAL CLICKING INVOLVED???
+source ~/.bashrc
+
+huggingface-cli login --token //TODO
+export HF_HOME=/mnt/hdd-baracuda/fberger/huggingface_cache
+
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export DATASETS=$PWD/CybersecurityBenchmarks/datasets
+export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
+export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "RTX A6000" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+
+git clone https://github.com/centerforaisafety/HarmBench.git
+cd HarmBench
+
+//Manual die requirements_pinned rüberziehen
+
+
+conda create -n harmbench python=3.9
+conda activate harmbench
+pip install -r requirements_pinned.txt
+python -m spacy download en_core_web_sm
+
+
+
+
+
+python ./scripts/run_pipeline.py --methods GCG --models all --step all --mode local
+python ./scripts/run_pipeline.py --methods AutoDAN --models llama2_7b --step all --mode local
+python ./scripts/run_pipeline.py --methods AutoPrompt --models llama2_7b --step all --mode local
+
+
+
+
+Notes: 
+Methoden: AutoDAN,AutoPrompt,DirectRequest,GCG-Multi,GCG-Transfer,FewShot,GBDA,GCG,HumanJailbreaks,PAIR,PAP-top5,PEZ,TAP,TAP-Transfer,UAT,Zero
+
+Modelle: llama2_7b,llama2_13b,llama2_70b,vicuna_7b_v1_5,vicuna_13b_v1_5,koala_7b,koala_13b,orca_2_7b,orca_2_13b,solar_10_7b_instruct,openchat_3_5_1210,starling_7b,mistral_7b_v2,mixtral_8x7b,zephyr_7b_robust6_data2,zephyr_7b,baichuan2_7b,baichuan2_13b,qwen_7b_chat,qwen_14b_chat,qwen_72b_chat,gpt-3.5-turbo-1106,gpt-3.5-turbo-0613,gpt-4-1106-preview,gpt-4-0613,gpt-4-vision-preview,claude-instant-1,claude-2.1,claude-2,gemini,mistral-medium,LLaVA,InstructBLIP,Qwen,GPT4V
+
+
+Konzentriert probiert:
+microsoft/DialoGPT-small
+meta-llama/Llama-2-7b-chat-hf
+

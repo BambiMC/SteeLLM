@@ -1,0 +1,28 @@
+cd /mnt/hdd-baracuda/fberger
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b
+source ~/.bashrc
+
+
+huggingface-cli login --token //TODO
+export HF_HOME=/mnt/hdd-baracuda/fberger/huggingface_cache
+
+export CUDA_DEVICE_ORDER=00000000:65:00.0
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
+export CUDA_VISIBLE_DEVICES=0
+
+
+git clone https://github.com/SheltonLiu-N/AutoDAN.git
+
+cd AutoDAN
+conda create -n AutoDAN python=3.9
+conda activate AutoDAN
+pip install -r requirements.txt
+
+cd models
+python download_models.py			//MODIFY TO DL OTHER MODELS
+cd ..
+
+python autodan_ga_eval.py
+

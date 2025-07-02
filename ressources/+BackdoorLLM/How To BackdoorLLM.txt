@@ -1,0 +1,62 @@
+cd /mnt/hdd-baracuda/fberger
+
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b	//MANUAL CLICKING INVOLVED???
+source ~/.bashrc
+
+git clone https://github.com/BambiMC/BackdoorLLM.git
+cd BackdoorLLM
+git pull
+
+conda create -n backdoorllm
+conda activate backdoorllm
+
+
+
+
+
+pip install -r requirements.txt
+pip install huggingface_hub deepspeed
+
+huggingface-cli login --token //TODO
+
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export DATASETS=$PWD/CybersecurityBenchmarks/datasets
+export HF_HOME=/mnt/hdd-baracuda/fberger/.huggingface_cache
+export XDG_CACHE_HOME=/mnt/hdd-baracuda/fberger/.xdg_cache
+export DEEPSPEED_CACHE_DIR=/mnt/hdd-baracuda/fberger/.deepspeed_cache
+export NCCL_P2P_DISABLE=1
+export NCCL_IB_DISABLE=1
+export MODEL_NAME=meta-llama/Llama-2-7b-chat-hf
+
+
+
+
+
+//TRAINING
+
+cd attack/DPA/
+torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py configs/jailbreak/meta-llama/Llama-2-7b-chat-hf/Llama-2-7b-chat-hf_jailbreak_badnet_lora.yaml
+
+
+//EVAL
+
+cd attack/DPA/
+python backdoor_evaluate.py
+
+Notes: 
+Help: 
+Konzentriert probiert:
+meta-llama/Llama-2-7b-chat-hf
+
+
+Model anpassen:
+Train anpassen
+Evaluate anpassen
+export MODEL_NAME anpassen
+Pfad+Dateiname zu Train config anpassen (für neue Modelle generieren)
+meta-llama/Llama-2-7b-chat-hf
+
+
+

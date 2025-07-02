@@ -1,0 +1,53 @@
+cd /mnt/hdd-baracuda/fberger
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b	//MANUAL CLICKING INVOLVED???
+source ~/.bashrc
+
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export DATASETS=$PWD/CybersecurityBenchmarks/datasets
+export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
+export OPENAI_API_KEY=//TODO
+
+
+//Das hier scheint besser zu funktionieren (3.10)
+conda create -y -n agentdojo python=3.10
+conda activate agentdojo
+
+//Mit eigens kompiliertem Package:
+//move the files (models.py, local_llm, benchmark.py, agent_pipeline.py)
+//TODO Noch die Nummer checken, falls es eine neue Versionsnummer gibt die nehmen, einfach schauen was in dem Directory liegt
+
+
+
+
+git clone https://github.com/BambiMC/agentdojo-hf.git
+cd agentdojo-hf
+
+git pull
+pip install build
+python -m build
+pip install dist/agentdojo-0.1.34-py3-none-any.whl --force-reinstall
+python -m agentdojo.scripts.benchmark -s workspace -ut user_task_0 -ut user_task_1 \
+    --model LLAMA_2_7B_CHAT_HF
+
+    --model GPT_3_5_TURBO_0125 \
+    --defense tool_filter --attack tool_knowledge
+
+
+
+
+
+
+Notes: 
+geht generell, aber rate limit mit dem momentanen Modell schnell erreicht (0.41€ in OpenAI, aber ich könnte Modell anpassen, funktioniert, jetzt noch lokales Modell miteinfügen)
+
+
+Konzentriert probiert:
+
+
+
+
+
+
+

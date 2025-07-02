@@ -1,0 +1,36 @@
+cd /mnt/hdd-baracuda/fberger
+
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b	//MANUAL CLICKING INVOLVED???
+source ~/.bashrc
+
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export DATASETS=$PWD/CybersecurityBenchmarks/datasets
+export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
+// export CUDA_VISIBLE_DEVICES=0
+
+
+git clone https://github.com/mdoumbouya/h4rm3l.git
+cd h4rm3l
+conda create -n h4rm3l python==3.10
+conda activate h4rm3l
+
+
+pip install -e h4rm3l
+//Alternativ nicht from source bauen?
+
+
+Die machen nur mit API-Keys, also entweder umbauen oder mit API Keys
+API Keys hochladen in keys.json (existiert im normalen repo noch nicht)
+
+
+
+Notes: 
+Help:
+
+
+
+Konzentriert probiert:
+
+

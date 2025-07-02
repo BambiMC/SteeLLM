@@ -1,0 +1,88 @@
+cd /mnt/hdd-baracuda/fberger
+
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash ~/Miniconda3-latest-Linux-x86_64.sh -b	//MANUAL CLICKING INVOLVED???
+source ~/.bashrc
+
+export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
+export DATASETS=$PWD/CybersecurityBenchmarks/datasets
+export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
+export CUDA_VISIBLE_DEVICES=0
+
+git clone https://github.com/AI-secure/DecodingTrust.git
+cd DecodingTrust
+
+
+conda create --name dt-test python=3.9 pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda activate dt-test
+
+pip install -e .
+pip install "decoding-trust @ git+https://github.com/AI-secure/DecodingTrust.git"
+
+
+
+
+/////////////////////////////////////
+//It is also possible to install DecodingTrust as a standalone package, but you will need to clone our repository again to run it with our data.
+conda create --name dt-test python=3.9
+conda activate dt-test
+pip install "decoding-trust @ git+https://github.com/AI-secure/DecodingTrust.git"
+/////////////////////////////////////
+
+//TODO - geht irgendwie nichts...
+./src/configs/config.yaml anpassen
+
+dt-run +key=//TODO +advglue=vicuna +model=openai/gpt-3.5-turbo-0301
+
+dt-run +toxicity=realtoxicityprompts-toxic  \
+    ++model=hf/../llama/llama-2-7b-hf \
+    ++toxicity.n=25 \
+    ++toxicity.template=1
+
+
+
+
+
+dt-run
+
+dt-run +key=//TODO 'model_config={model:openai/gpt-3.5-turbo-0301,type:CHAT}'
+
+dt-run +key=//TODO '+model_config={model:openai/gpt-3.5-turbo-0301,type:CHAT}'
+
+dt-run +key=//TODO
+
+
+dt-run +advglue=true +key=//TODO +model_config.model=openai/gpt-3.5-turbo-0301 +model_config.type=CHAT
+
+
+
+
+
+
+
+
+
+Notes: 
+Help:
+
+
+
+Konzentriert probiert:
+
+
+Neuer Versuch:
+
+
+
+conda create -y --name dt-test python=3.9 pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda activate dt-test
+pip install --upgrade setuptools
+pip install "decoding-trust @ git+https://github.com/AI-secure/DecodingTrust.git"
+
+
+
+
+
+
+
