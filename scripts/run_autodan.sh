@@ -56,7 +56,8 @@ conda activate "$CONDA_ENV_NAME"
 if [[ ! -d "$REPO_DIR" ]]; then
     git clone "$REPO_URL" "$REPO_DIR"
 else
-    echo "Repository already cloned."
+    echo "Repository already cloned. -> Updating..."
+    git pull
 fi
 
 # === Install requirements ===
