@@ -1,4 +1,7 @@
 #!/bin/bash
+GPU_NAME="RTX A6000"
+HF_MODEL_NAME="meta-llama/Llama-2-7b-chat-hf"
+
 USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' environment.json)
 INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' environment.json)
 HF_TOKEN_FILE="$USER_DIR/.hf_token"
@@ -6,10 +9,9 @@ MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
 PIP_CACHE_DIR="$INSTALL_DIR/.cache"
 CONDA_ENV_NAME="AutoDAN"
-REPO_URL="https://github.com/SheltonLiu-N/AutoDAN.git"
+REPO_URL="https://github.com/BambiMC/AutoDAN.git"
 REPO_DIR="$INSTALL_DIR/AutoDAN"
 PYTHON_VERSION="3.10"
-GPU_NAME="RTX A6000"
 
 set -e  # Stop if any command fails
 trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
@@ -73,7 +75,7 @@ echo "All requirements installed for $CONDA_ENV_NAME environment."
 
 # === Start benchmark ===
 cd models
-python download_models.py
+python download_models.py $HF_MODEL_NAME
 cd ..
-python autodan_ga_eval.py
+python autodan_ga_eval.py --model $HF_MODEL_NAME
 
