@@ -1,13 +1,28 @@
-Requirements:
-Cmake evtl.
-Python
-Pip
-Git
-Linux
+# Requirements
 
-TODO:
-Fill in the api_keys.json file with your API keys.
-Fill in environment variables in the environment.json file.
+- CMake (optional)
+- Python
+- Pip
+- Git
+- Linux
 
-Run official benchmark:
-bash official_benchmark.sh
+# How to run SteeLLM
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. Fill in the api_keys.json & environment.json file with your API keys.
+
+   ```bash
+   nano api_keys.json
+   nano environment.json
+   ```
+
+3. Run the official benchmark:
+   ```bash
+   cd scripts
+   bash official_benchmark.sh
+   ```

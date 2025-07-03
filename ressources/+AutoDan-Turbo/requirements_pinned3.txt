@@ -1,10 +1,15 @@
+faiss-gpu==1.8.0
+torch
+pytorch-cuda==12
+numpy
+
 spacy==3.7.2
 confection==0.1.4
 vllm>=0.3.0
 transformers<=4.44.2
 fschat<=0.2.36
 ray<=2.34.0
-openai>=1.25.1
+openai==0.28
 anthropic<=0.34.1
 mistralai<=1.0.2
 google-generativeai<=0.7.2
@@ -21,3 +26,4 @@ boto3<=1.35.5
 bpe<=1.0
 fbgemm-gpu<=0.8.0
 wandb==0.19.11
+

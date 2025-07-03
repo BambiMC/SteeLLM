@@ -20,4 +20,4 @@ tenacity
 boto3
 bpe
 fbgemm-gpu
-wandb==0.19.11
+wandb

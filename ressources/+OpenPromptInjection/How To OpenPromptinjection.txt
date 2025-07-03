@@ -9,7 +9,7 @@ export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
 export DATASETS=$PWD/CybersecurityBenchmarks/datasets
 export HF_HOME="/mnt/hdd-baracuda/fberger/huggingface_cache/"
 export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "RTX 4000" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
-export CUDA_DEVICE_ORDER=00000000:5E:00.0
+export CUDA_DEVICE_ORDER=00000000:5E:00.0  //Das ist nicht mehr aktuell, muss ich dynamisch über Namen ermitteln
 export CUDA_VISIBLE_DEVICES=1
 
 

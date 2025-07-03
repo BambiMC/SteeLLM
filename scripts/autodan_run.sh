@@ -2,8 +2,8 @@
 GPU_NAME="RTX A6000"
 HF_MODEL_NAME="meta-llama/Llama-2-7b-chat-hf"
 
-USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' environment.json)
-INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' environment.json)
+USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../environment.json)
+INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../environment.json)
 HF_TOKEN_FILE="$USER_DIR/.hf_token"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
@@ -12,6 +12,12 @@ CONDA_ENV_NAME="AutoDAN"
 REPO_URL="https://github.com/BambiMC/AutoDAN.git"
 REPO_DIR="$INSTALL_DIR/AutoDAN"
 PYTHON_VERSION="3.10"
+
+
+
+SCRIPTS_DIR=$PWD
+RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json"
+
 
 set -e  # Stop if any command fails
 trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
@@ -37,7 +43,7 @@ fi
 eval "$(conda shell.bash hook)"
 
 # === Huggingface Setup ===
-HF_TOKEN=$(grep -oP '"huggingface"\s*:\s*"\K[^"]+' api_keys.json)
+HF_TOKEN=$(grep -oP '"huggingface"\s*:\s*"\K[^"]+' ../api_keys.json)
 if [[ -n "$HF_TOKEN" ]]; then
     huggingface-cli login --token "$HF_TOKEN"
 else
@@ -78,5 +84,7 @@ echo "All requirements installed for $CONDA_ENV_NAME environment."
 cd models
 python download_models.py $HF_MODEL_NAME
 cd ..
-python autodan_ga_eval.py --model $HF_MODEL_NAME
+python autodan_ga_eval.py --model $HF_MODEL_NAME --num_steps 20 --dataset_path ./data/advbench/harmful_behaviors_excerpt.csv
 
+# === Evaluate results ===
+python ${SCRIPTS_DIR}/autodan_eval.py ${RESULTS} ${HF_MODEL_NAME}

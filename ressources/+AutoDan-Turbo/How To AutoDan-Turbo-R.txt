@@ -10,13 +10,13 @@ export HF_HOME=/mnt/hdd-baracuda/fberger/.huggingface_cache
 wandb login
 export WANDB_API_KEY=//TODO
 
-export CUDA_DEVICE_ORDER=00000000:65:00.0
+export CUDA_DEVICE_ORDER=00000000:65:00.0  //Das ist nicht mehr aktuell, muss ich dynamisch über Namen ermitteln
 export PIP_CACHE_DIR=/mnt/hdd-baracuda/fberger/.cache/
 export CUDA_VISIBLE_DEVICES=0
 
 
 
-git clone https://github.com/SaFoLab-WISC/AutoDAN-Turbo.git
+git clone https://github.com/BambiMC/AutoDAN-Turbo.git
 cd AutoDAN-Turbo
 
 export DATASETS=$PWD/CybersecurityBenchmarks/datasets
@@ -26,7 +26,7 @@ conda activate autodanturbo
 
 
 conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
-pip install -r requirements_pinned.txt
+pip install -r requirements_pinned3.txt
 pip install --upgrade openai
 //TODO wand version spezifizieren in requirements.txt
 //Vllt ist die requirements_pinned2 noch besser?

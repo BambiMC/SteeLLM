@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 import pkg_resources
 from datetime import timezone
 
-CUTOFF_DATE = datetime.now(timezone.utc) - timedelta(days=10*30)
+# CUTOFF_DATE = datetime.now(timezone.utc) - timedelta(days=10*30)
+CUTOFF_DATE = datetime(2024, 7, 1, tzinfo=timezone.utc)
 
 def get_versions_older_than(package_name, cutoff_date):
     url = f"https://pypi.org/pypi/{package_name}/json"
