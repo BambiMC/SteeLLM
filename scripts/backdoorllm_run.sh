@@ -2,6 +2,9 @@
 
 # === CONFIGURATION ===
 MODEL_NAME="meta-llama/Llama-2-7b-chat-hf"
+# MODEL_NAME_SPLIT='/' read -ra MODEL_NAME_SPLIT <<< "$MODEL_NAME"
+IFS='/' read -ra MODEL_NAME_SPLIT <<< "$MODEL_NAME"
+
 INSTALL_DIR="/mnt/hdd-baracuda/fberger"
 MINICONDA_SCRIPT="Miniconda3-latest-Linux-x86_64.sh"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
@@ -15,7 +18,10 @@ HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
 XDG_CACHE_HOME="$INSTALL_DIR/.xdg_cache"
 DEEPSPEED_CACHE_DIR="$INSTALL_DIR/.deepspeed_cache"
 
-TRAIN_CONFIG="configs/jailbreak/meta-llama/Llama-2-7b-chat-hf/Llama-2-7b-chat-hf_jailbreak_badnet_lora.yaml"
+TRAIN_CONFIG="configs/jailbreak/${MODEL_NAME_SPLIT[0]}/${MODEL_NAME_SPLIT[1]}/${MODEL_NAME_SPLIT[1]}_jailbreak_badnet_lora.yaml"
+
+SCRIPTS_DIR=$PWD
+
 
 set -e
 trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
@@ -50,16 +56,20 @@ conda activate "$CONDA_ENV_NAME"
 
 # === Install Python Dependencies ===
 pip install -r requirements.txt
+
 pip install huggingface_hub deepspeed
 
-# === HuggingFace Login ===
+cd "$SCRIPTS_DIR"
+
+# === Huggingface Setup ===
 HF_TOKEN=$(grep -oP '"huggingface"\s*:\s*"\K[^"]+' ../api_keys.json)
 if [[ -n "$HF_TOKEN" ]]; then
     huggingface-cli login --token "$HF_TOKEN"
 else
-    echo "❌ HuggingFace token missing in api_keys.json"
+    echo "huggingface missing in api_keys.json. Please add your token."
     exit 1
 fi
+
 
 # === Environment Variables ===
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
@@ -72,10 +82,23 @@ export MODEL_NAME="$MODEL_NAME"
 export DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
 
 # === Training ===
-cd "$REPO_DIR/attack/DPA"
-torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py "$TRAIN_CONFIG"
+cd "$REPO_DIR/attack/DPA" #TODO auch noch die anderen, nicht nur DPA machen
+# torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py "$TRAIN_CONFIG" #TODO
 
-# === Evaluation ===
+# === Test ===
 python backdoor_evaluate.py $MODEL_NAME
 
-echo "✅ Training and evaluation complete for model: $MODEL_NAME"
+# === Evaluation ===
+SAVE_FILE="$REPO_DIR/attack/DPA/eval_result/jailbreak/badnet/eval_${MODEL_NAME}/eval_${MODEL_NAME}_jailbreak_None.json"
+
+# DIR="$REPO_DIR/attack/DPA/eval_result/jailbreak/badnet/eval_${MODEL_NAME}"
+# FILE_PATTERN="eval_ASR_*_${MODEL_NAME}_jailbreak_badnet.json"
+
+# # Find the newest file matching the pattern
+# SAVE_FILE=$(find "$DIR" -type f -name "$FILE_PATTERN" -printf "%T@ %p\n" | sort -nr | head -n 1 | cut -d' ' -f2-)
+
+echo "Found save file: $SAVE_FILE" #TODO temp
+
+cd "$SCRIPTS_DIR"
+
+python backdoorllm_eval.py $SAVE_FILE $MODEL_NAME

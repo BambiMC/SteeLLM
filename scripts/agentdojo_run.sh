@@ -14,7 +14,7 @@ REPO_DIR="$INSTALL_DIR/agentdojo-hf"
 PYTHON_VERSION="3.10"
 
 SCRIPTS_DIR=$PWD
-RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json" #TODO
+
 
 set -e  # Stop if any command fails
 trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
@@ -106,7 +106,7 @@ AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace \
 
 # === Evaluate results ===
 # Average utility: 2.50%
-python ${SCRIPTS_DIR}/agentdojo_eval.py ${RESULTS} ${HF_MODEL_NAME}
+python ${SCRIPTS_DIR}/agentdojo_eval.py ${AVG_UTILITY} ${HF_MODEL_NAME}
 
 
 

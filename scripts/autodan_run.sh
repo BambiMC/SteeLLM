@@ -50,6 +50,7 @@ else
     echo "huggingface missing in api_keys.json. Please add your token."
     exit 1
 fi
+cd "$REPO_DIR"
 
 # === Create Conda Environment ===
 if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
@@ -67,7 +68,6 @@ else
 fi
 
 # === Install requirements ===
-cd "$REPO_DIR"
 
 if grep -q "numpy==1.26.0" requirements.txt; then
     sed -i 's/numpy==1.26.0/numpy>=1.26.0/' requirements.txt
@@ -85,6 +85,8 @@ cd models
 python download_models.py $HF_MODEL_NAME
 cd ..
 python autodan_ga_eval.py --model $HF_MODEL_NAME --num_steps 20 --dataset_path ./data/advbench/harmful_behaviors_excerpt.csv
+#TODO python autodan_hga_eval.py --model $HF_MODEL_NAME --num_steps 20 --dataset_path ./data/advbench/harmful_behaviors_excerpt.csv
+
 
 # === Evaluate results ===
 python ${SCRIPTS_DIR}/autodan_eval.py ${RESULTS} ${HF_MODEL_NAME}
