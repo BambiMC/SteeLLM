@@ -1,9 +1,11 @@
 #!/bin/bash
-GPU_NAME="RTX A6000"
-HF_MODEL_NAME="meta-llama/Llama-2-7b-chat-hf"
 
-USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../environment.json)
-INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../environment.json)
+# === CONFIGURATION ===
+GPU_NAME="RTX A6000" #TODO brauch ich das wirklich?
+HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
+SCRIPTS_DIR=$PWD
+USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
+INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
 HF_TOKEN_FILE="$USER_DIR/.hf_token"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
@@ -11,12 +13,8 @@ PIP_CACHE_DIR="$INSTALL_DIR/.cache"
 CONDA_ENV_NAME="AutoDAN"
 REPO_URL="https://github.com/BambiMC/AutoDAN.git"
 REPO_DIR="$INSTALL_DIR/AutoDAN"
-PYTHON_VERSION="3.10"
-
-
-
-SCRIPTS_DIR=$PWD
 RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json"
+PYTHON_VERSION="3.10"
 
 
 set -e  # Stop if any command fails
@@ -43,11 +41,11 @@ fi
 eval "$(conda shell.bash hook)"
 
 # === Huggingface Setup ===
-HF_TOKEN=$(grep -oP '"huggingface"\s*:\s*"\K[^"]+' ../api_keys.json)
+HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
 if [[ -n "$HF_TOKEN" ]]; then
     huggingface-cli login --token "$HF_TOKEN"
 else
-    echo "huggingface missing in api_keys.json. Please add your token."
+    echo "huggingface missing in config.json. Please add your token."
     exit 1
 fi
 cd "$REPO_DIR"

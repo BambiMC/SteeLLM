@@ -1,0 +1,10 @@
+{
+    "USER_DIR": "/home/fberger",
+    "INSTALL_DIR": "/mnt/hdd-baracuda/fberger",
+    "OPENAI_API_KEY": "",
+    "DEEPSEEK_API_KEY": "",
+    "GOOGLE_TODO": "",
+    "HUGGINGFACE_API_KEY": "",
+    "WANDB_API_KEY": "",
+    "HF_MODEL_NAME": "meta-llama/Llama-2-7b-chat-hf"
+}

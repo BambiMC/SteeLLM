@@ -1,10 +1,8 @@
-
 #!/bin/bash
 
 # === CONFIGURATION ===
 
-MODEL_NAME="meta-llama/Llama-2-7b-chat-hf"
-
+HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
 INSTALL_DIR="/mnt/hdd-baracuda/fberger"
 MINICONDA_SCRIPT="Miniconda3-latest-Linux-x86_64.sh"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
@@ -12,10 +10,8 @@ REPO_URL="https://github.com/liu00222/Open-Prompt-Injection.git"
 REPO_NAME="Open-Prompt-Injection"
 REPO_DIR="$INSTALL_DIR/$REPO_NAME"
 CONDA_ENV_NAME="openpromptinjection"
-
 PIP_CACHE_DIR="$INSTALL_DIR/.cache"
-HF_CACHE_DIR="$INSTALL_DIR/huggingface_cache"
-
+HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
 SCRIPTS_DIR=$PWD
 
 set -e
@@ -70,22 +66,22 @@ CUDA_DEVICES=0
 cd "$SCRIPTS_DIR"
 
 # === Huggingface Setup ===
-HF_TOKEN=$(grep -oP '"huggingface"\s*:\s*"\K[^"]+' ../api_keys.json)
+HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
 if [[ -n "$HF_TOKEN" ]]; then
     huggingface-cli login --token "$HF_TOKEN"
 else
-    echo "huggingface missing in api_keys.json. Please add your token."
+    echo "huggingface missing in config.json. Please add your token."
     exit 1
 fi
 
 # === Run Script ===
 cd "$REPO_DIR"
 echo "Run openpromptinjection.py"
-python openpromptinjection.py $MODEL_NAME
+python openpromptinjection.py $HF_MODEL_NAME
 
 
 # === Evaluation ===
 RESULTS="$REPO_DIR/evaluation_metrics.json"
 
 cd "$SCRIPTS_DIR"
-python openpromptinjection_eval.py $RESULTS $MODEL_NAME
+python openpromptinjection_eval.py $RESULTS $HF_MODEL_NAME

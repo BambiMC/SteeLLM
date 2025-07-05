@@ -14,14 +14,13 @@
    git clone <repository-url>
    ```
 
-2. Fill in the api_keys.json & environment.json file with your API keys.
+2. Fill in the parameters in the config.json file
 
    ```bash
-   nano api_keys.json
-   nano environment.json
+   nano config.json
    ```
 
-3. Run the official benchmark:
+3. Run the official benchmark from within the scripts directory:
    ```bash
    cd scripts
    bash official_benchmark.sh
