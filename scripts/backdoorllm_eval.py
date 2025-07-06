@@ -16,7 +16,7 @@ with open(RESULTS, 'r') as f:
         # find line that contains ASR
         if "ASR" in line:
             # Extract the ASR value using regex
-            match = re.search(r'ASR:\s*([\d.]+)', line)
+            match = re.search(r'ASR_scores":\s*([\d.]+)', line)
             if match:
                 asr_value = float(match.group(1))
                 print(f"ASR: {asr_value}")

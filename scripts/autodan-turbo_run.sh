@@ -42,6 +42,25 @@ if ! command -v conda &> /dev/null; then
 fi
 eval "$(conda shell.bash hook)"
 
+# === Create Conda Environment ===
+if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
+    echo "Creating conda environment $CONDA_ENV_NAME with Python $PYTHON_VERSION..."
+    conda create -y -n "$CONDA_ENV_NAME" python="$PYTHON_VERSION"
+fi
+conda activate "$CONDA_ENV_NAME"
+
+# === Clone AutoDAN-Turbo Repo ===
+if [[ ! -d "$REPO_DIR" ]]; then
+    git clone "$REPO_URL" "$REPO_DIR"
+fi
+cd "$REPO_DIR"
+git pull
+
+# === Install Dependencies ===
+conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
+pip install -r requirements_pinned.txt
+pip install --upgrade openai
+
 # === Huggingface Setup ===
 HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
 if [[ -n "$HF_TOKEN" ]]; then
@@ -77,24 +96,7 @@ if [[ -z "$DEEPSEEK_TOKEN" ]]; then
     exit 1
 fi
 
-# === Create Conda Environment ===
-if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
-    echo "Creating conda environment $CONDA_ENV_NAME with Python $PYTHON_VERSION..."
-    conda create -y -n "$CONDA_ENV_NAME" python="$PYTHON_VERSION"
-fi
-conda activate "$CONDA_ENV_NAME"
 
-# === Clone AutoDAN-Turbo Repo ===
-if [[ ! -d "$REPO_DIR" ]]; then
-    git clone "$REPO_URL" "$REPO_DIR"
-fi
-cd "$REPO_DIR"
-git pull
-
-# === Install Dependencies ===
-conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
-pip install -r requirements_pinned.txt
-pip install --upgrade openai
 
 # === Optional: Use alternate requirements file? ===
 # pip install -r requirements_pinned2.txt  # Uncomment if preferred

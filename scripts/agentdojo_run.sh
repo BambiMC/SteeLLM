@@ -96,21 +96,28 @@ pip install "$WHEEL_FILE" --force-reinstall
 
 
 HF_MODEL_NAME_ENUM=$(echo "$HF_MODEL_NAME" | sed -E 's/[-\/]/_/g' | tr '[:lower:]' '[:upper:]')
+echo "Using HF_MODEL_NAME_ENUM: $HF_MODEL_NAME_ENUM"
 
 # === Run Benchmark ===
 # python -m agentdojo.scripts.benchmark -s workspace \
 #     --model $HF_MODEL_NAME_ENUM \
 
 AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace \
-    --model "$HF_MODEL_NAME_ENUM" | grep "Average Utility" | awk -F ':' '{print $2}' | xargs)
+    --model "$HF_MODEL_NAME_ENUM" | grep "Average utility" | awk -F ':' '{print $2}' | xargs)
+
+
+# Average utility: 0.00%
+
+
 
 
 # === Evaluate results ===
-# Average utility: 2.50%
-python ${SCRIPTS_DIR}/agentdojo_eval.py ${AVG_UTILITY} ${HF_MODEL_NAME}
+cd "$SCRIPTS_DIR"
 
+echo "Average Utility: $AVG_UTILITY"
+echo "HF_MODEL_NAME: $HF_MODEL_NAME"
 
-
+python agentdojo_eval.py ${AVG_UTILITY} ${HF_MODEL_NAME}
 
 
 # TODO --attack
@@ -153,3 +160,4 @@ python ${SCRIPTS_DIR}/agentdojo_eval.py ${AVG_UTILITY} ${HF_MODEL_NAME}
 
 
 
+#TODO bei allen die git pull festsetzen, damit neue Commits das Benchmark nicht kaputt machen

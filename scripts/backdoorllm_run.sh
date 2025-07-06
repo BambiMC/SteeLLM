@@ -3,8 +3,8 @@
 # === CONFIGURATION ===
 HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
 IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
-SCRIPTS_DIR=$PWD
 INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
+SCRIPTS_DIR=$PWD
 MINICONDA_SCRIPT="Miniconda3-latest-Linux-x86_64.sh"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 CONDA_ENV_NAME="backdoorllm"
@@ -84,6 +84,9 @@ cd "$REPO_DIR/attack/DPA" #TODO auch noch die anderen, nicht nur DPA machen
 # === Test ===
 python backdoor_evaluate.py $HF_MODEL_NAME
 
+AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace \
+    --model "$HF_MODEL_NAME_ENUM" | grep "Average utility" | awk -F ':' '{print $2}' | xargs)
+
 # === Evaluation ===
 SAVE_FILE="$REPO_DIR/attack/DPA/eval_result/jailbreak/badnet/eval_${HF_MODEL_NAME}/eval_${HF_MODEL_NAME}_jailbreak_badnet.json" #TODO es gibt auch noch die mit none, aber am relevantesten dürfte wohl die mit badnet sein, weil höhere ASR
 
@@ -98,3 +101,5 @@ echo "Found save file: $SAVE_FILE" #TODO temp
 cd "$SCRIPTS_DIR"
 
 python backdoorllm_eval.py $SAVE_FILE $HF_MODEL_NAME
+
+#TODO Backdoorllm kriegt es hin, auf allen drei GPUs zu laufen!
