@@ -72,7 +72,8 @@ if [[ ! -d "$REPO_DIR" ]]; then
 fi
 cd "$REPO_DIR"
 
-git pull
+git reset --hard HEAD # Otherwise the template will not be there to be updated, if the benchmark is run multiple times
+
 
 # Modify ModelsEnum.py to include HF_MODEL_NAME
 python modify_ModelsEnum.py "$HF_MODEL_NAME"

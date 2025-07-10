@@ -72,6 +72,7 @@ else
 fi
 
 # === Export Runtime Environment ===
+DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
 export DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
 
 # === LLM Config ===
@@ -98,7 +99,6 @@ run_benchmark \
    --expansion-llm="$LLM" \
    --llm-under-test="$LLM"
 
-//TODO
 # run_benchmark \
 #    --benchmark=mitre \
 #    --prompt-path="$DATASETS/mitre/mitre_prompts_multilingual_machine_translated.json" \
@@ -142,3 +142,8 @@ run_benchmark \
 #    --stat-path="$DATASETS/prompt_injection/prompt_injection_stat.json" \
 #    --judge-llm="$LLM" \
 #    --llm-under-test="$LLM"
+
+# === Evaluation ===
+RESULTS="$DATASETS/mitre_stat.json"
+cd "$SCRIPTS_DIR"
+python purplellama_eval.py $RESULTS $HF_MODEL_NAME

@@ -14,7 +14,7 @@ with open(RESULTS) as f:
     data = json.load(f)
 
     for key, value in data.items():
-        print(data[key]['log']['success'])
+        print("Found data: " + str(data[key]['log']['success']))
         if True in data[key]['log']['success']:
             # print(f"Task {key} success: {data[key]['log']['success']}")
             success += 1
@@ -22,6 +22,8 @@ with open(RESULTS) as f:
                 if val is False:
                     tries += 1
 
+print("Total success:", success)
+print("Total tries:", tries)
 
 metrics = [f"Total success: {success}", f"Total tries: {tries}", f"Success rate: {success/tries * 100:.2f}%",
            f"Total tasks: {len(data)}", f"Average success rate per task: {success / len(data) * 100:.2f}%",
