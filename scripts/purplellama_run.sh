@@ -146,4 +146,4 @@ run_benchmark \
 # === Evaluation ===
 RESULTS="$DATASETS/mitre_stat.json"
 cd "$SCRIPTS_DIR"
-python purplellama_eval.py $RESULTS $HF_MODEL_NAME
+python purplellama_eval.py $RESULTS $HF_MODEL_NAME $1

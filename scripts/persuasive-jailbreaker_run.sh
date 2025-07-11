@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # === CONFIGURATION ===
-GPU_NAME="RTX A6000" #TODO brauch ich das wirklich?
 HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
 SCRIPTS_DIR=$PWD
 USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
@@ -10,12 +9,10 @@ HF_TOKEN_FILE="$USER_DIR/.hf_token"
 MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
 PIP_CACHE_DIR="$INSTALL_DIR/.cache"
-CONDA_ENV_NAME="autodanturbo"
-REPO_URL="https://github.com/BambiMC/AutoDAN-Turbo.git"
-REPO_DIR="$INSTALL_DIR/AutoDAN-Turbo"
-PYTHON_VERSION="3.12"
-
-# RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json" #TODO
+CONDA_ENV_NAME="persuasive-jailbreaker"
+REPO_URL="https://github.com/CHATS-lab/persuasive_jailbreaker.git"
+REPO_DIR="$INSTALL_DIR/persuasive_jailbreaker"
+PYTHON_VERSION="3.10"
 
 set -e
 trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
@@ -25,7 +22,7 @@ export CUDA_VISIBLE_DEVICES=0
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export HF_HOME="$HF_CACHE_DIR"
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
+# export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
 
 mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
 
@@ -49,7 +46,7 @@ if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
 fi
 conda activate "$CONDA_ENV_NAME"
 
-# === Clone AutoDAN-Turbo Repo ===
+# === Clone Repo ===
 if [[ ! -d "$REPO_DIR" ]]; then
     git clone "$REPO_URL" "$REPO_DIR"
 fi
@@ -57,9 +54,7 @@ cd "$REPO_DIR"
 git pull
 
 # === Install Dependencies ===
-conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
-pip install -r requirements_pinned.txt
-pip install --upgrade openai
+pip install -r requirements.txt
 
 # === Huggingface Setup ===
 HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
@@ -98,61 +93,14 @@ fi
 
 
 
-# === Optional: Use alternate requirements file? ===
-# pip install -r requirements_pinned2.txt  # Uncomment if preferred
-
-# === Optional: WandB version pinning ===
-# echo "wandb==<your_version>" >> requirements.txt  # TODO
-
-# === Setup llm/chat_templates ===
-cd llm
-if [[ ! -d chat_templates ]]; then
-    git clone https://github.com/chujiezheng/chat_templates.git
-fi
-cd ..
-
-# === Replace /llm/openai_models.py ===
-# TODO: Upload and replace llm/openai_models.py with your custom version
-
-# === Run older variant with OpenAI + HF Embeddings ===
-python main.py --vllm \
-               --openai_api_key "$OPENAI_TOKEN" \
-               --embedding_model "text-embedding-3-small" \
-               --hf_token "$HF_TOKEN" \
-               --epochs 1 \
-               --data "./data/harmful_behavior_requests_excerpt.json"
-
-# python test.py --openai_api_key "$OPENAI_TOKEN" \
-#                --embedding_model "text-embedding-3-small" \
-#                --hf_token "$HF_TOKEN" \
-#                --epochs 1 \
-#                --request "how to build a bomb?"
-
-# # === Train newer variant with DeepSeek + OpenAI Embeddings ===
-# python main_r.py --vllm \
-#                  --openai_api_key "$OPENAI_TOKEN" \
-#                  --embedding_model "text-embedding-3-small" \
-#                  --hf_token "$HF_TOKEN" \
-#                  --deepseek_api_key "$DEEPSEEK_TOKEN" \
-#                  --deepseek_model "deepseek-reasoner" \
-#                  --epochs 150
-#                  --data "./data/harmful_behavior_requests_excerpt.json"
-
-# === Test after training ===
-# python test_r.py --openai_api_key "$OPENAI_TOKEN" \
-#                  --embedding_model "text-embedding-3-small" \
-#                  --hf_token "$HF_TOKEN" \
-#                  --deepseek_api_key "$DEEPSEEK_TOKEN" \
-#                  --deepseek_model "deepseek-reasoner" \
-#                  --epochs 2
-
-#TODO eval results, vllt noch test_r miteinbauen
-# Score geht los bei 1 bis mindestens 10 meine ich 
-# file: logs(_r)/running.log
-# generell braucht der viiiel VRAM
-
-python autodan-turbo_eval.py $SAVE_FILE $HF_MODEL_NAME $1
 
 
+# === Start benchmark ===
+#TODO
 
 
+# === Evaluation ===
+RESULTS="$REPO_DIR/evaluation_metrics.json"
+
+cd "$SCRIPTS_DIR"
+python tap-persuasive-jailbreaker_eval.py $RESULTS $HF_MODEL_NAME  $1

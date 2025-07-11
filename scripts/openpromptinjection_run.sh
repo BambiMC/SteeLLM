@@ -84,4 +84,4 @@ python openpromptinjection.py $HF_MODEL_NAME
 RESULTS="$REPO_DIR/evaluation_metrics.json"
 
 cd "$SCRIPTS_DIR"
-python openpromptinjection_eval.py $RESULTS $HF_MODEL_NAME
+python openpromptinjection_eval.py $RESULTS $HF_MODEL_NAME  $1

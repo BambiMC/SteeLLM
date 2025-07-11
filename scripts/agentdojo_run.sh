@@ -118,7 +118,7 @@ cd "$SCRIPTS_DIR"
 echo "Average Utility: $AVG_UTILITY"
 echo "HF_MODEL_NAME: $HF_MODEL_NAME"
 
-python agentdojo_eval.py ${AVG_UTILITY} ${HF_MODEL_NAME}
+python agentdojo_eval.py $AVG_UTILITY $HF_MODEL_NAME $1
 
 
 # TODO --attack

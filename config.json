@@ -6,5 +6,6 @@
     "GOOGLE_TODO": "",
     "HUGGINGFACE_API_KEY": "",
     "WANDB_API_KEY": "",
+    "CENTRALIZED_LOGGING": false,
     "HF_MODEL_NAME": "meta-llama/Llama-2-7b-chat-hf"
 }

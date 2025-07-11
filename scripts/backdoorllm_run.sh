@@ -100,6 +100,6 @@ echo "Found save file: $SAVE_FILE" #TODO temp
 
 cd "$SCRIPTS_DIR"
 
-python backdoorllm_eval.py $SAVE_FILE $HF_MODEL_NAME
+python backdoorllm_eval.py $SAVE_FILE $HF_MODEL_NAME $1
 
 #TODO Backdoorllm kriegt es hin, auf allen drei GPUs zu laufen!

@@ -1,18 +1,24 @@
+
 import json
 import sys
 import os
 import pathlib
 import datetime
 import re
+import pandas as pd
 
-AVG_UTILITY = sys.argv[1]
+RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
 CENTRALIZED_LOGGING = sys.argv[3] if len(sys.argv) > 3 else "false"
 
-success = 0
-tries = 0
 
-metrics = [f"Average Utility: {AVG_UTILITY}"]
+
+df = pd.read_parquet(RESULTS)
+print(df.head())
+
+metrics = df['judge_scores']
+metrics_line = ', '.join(metrics.astype(str).tolist())  # Join scores with commas
+print (f"Metrics: {metrics_line}")
 
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 header = [
@@ -21,12 +27,10 @@ header = [
 footer = [
     f"--- End of Metrics ---"
 ]
-metrics = header + metrics + footer
+metrics = header + [metrics_line] + footer
 
 
-
-
-file_path = os.path.dirname(os.path.abspath(__file__)) + "/agentdojo_results.txt"
+file_path = os.path.dirname(os.path.abspath(__file__)) + "/tap_results.txt"
 if CENTRALIZED_LOGGING.lower() == "true":
     file_path = os.path.dirname(os.path.abspath(__file__)) + "/centralized_results.txt"
 
@@ -39,3 +43,5 @@ else:
     with open(file_path, "a") as file:
         file.write("\n")
         file.write("\n".join(metrics) + "\n")
+
+

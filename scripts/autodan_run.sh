@@ -87,4 +87,4 @@ python autodan_ga_eval.py --model $HF_MODEL_NAME --num_steps 20 --dataset_path .
 
 
 # === Evaluate results ===
-python ${SCRIPTS_DIR}/autodan_eval.py ${RESULTS} ${HF_MODEL_NAME}
+python ${SCRIPTS_DIR}/autodan_eval.py $RESULTS $HF_MODEL_NAME $1

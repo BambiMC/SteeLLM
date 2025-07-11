@@ -6,6 +6,8 @@ import datetime
 
 RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
+CENTRALIZED_LOGGING = sys.argv[3] if len(sys.argv) > 3 else "false"
+
 
 success = 0
 tries = 0
@@ -41,6 +43,9 @@ metrics = header + metrics + footer
 
 
 file_path = os.path.dirname(os.path.abspath(__file__)) + "/autodan_results.txt"
+if CENTRALIZED_LOGGING.lower() == "true":
+    file_path = os.path.dirname(os.path.abspath(__file__)) + "/centralized_results.txt"
+
 print(f"Writing results to {file_path}")
 if not os.path.exists(file_path):
     with open(file_path, "w") as file:
