@@ -16,9 +16,9 @@ REPO_DIR="$INSTALL_DIR/agentdojo-hf"
 PYTHON_VERSION="3.10"
 
 
-
 set -e  # Stop if any command fails
 trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
+
 
 # === ENV VARIABLES ===
 export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
@@ -27,6 +27,7 @@ export PIP_CACHE_DIR="$PIP_CACHE_DIR"
 export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
 
 mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
+
 
 # === Miniconda Setup ===
 if ! command -v conda &> /dev/null; then
@@ -66,59 +67,39 @@ if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
 fi
 conda activate "$CONDA_ENV_NAME"
 
-# === Clone and Build agentdojo-hf ===
+# === Clone Repository and build agentdojo-hf ===
 if [[ ! -d "$REPO_DIR" ]]; then
     git clone "$REPO_URL" "$REPO_DIR"
 fi
 cd "$REPO_DIR"
-
 git reset --hard HEAD # Otherwise the template will not be there to be updated, if the benchmark is run multiple times
 
 
 # Modify ModelsEnum.py to include HF_MODEL_NAME
 python modify_ModelsEnum.py "$HF_MODEL_NAME"
 
+
+# === Install Requirements ===
 pip install build
 python -m build
-
-# You may want to check the actual version number instead of hardcoding:
 WHEEL_FILE=$(ls dist/agentdojo-*-py3-none-any.whl | tail -n 1)
-
-# temporary
 pip install "$WHEEL_FILE" --force-reinstall
 
-# if ! pip show agentdojo &> /dev/null; then
-#     pip install "$WHEEL_FILE"
-# else
-#     echo "agentdojo already installed. Skipping reinstall."
-# fi
 
 # === Modify HF_MODEL_NAME to support ModelsEnum ===
-
-
-HF_MODEL_NAME_ENUM=$(echo "$HF_MODEL_NAME" | sed -E 's/[-\/]/_/g' | tr '[:lower:]' '[:upper:]')
+HF_MODEL_NAME_ENUM=$(echo "$HF_MODEL_NAME" | sed -E 's/[-\/\.]/_/g' | tr '[:lower:]' '[:upper:]')
 echo "Using HF_MODEL_NAME_ENUM: $HF_MODEL_NAME_ENUM"
 
 # === Run Benchmark ===
-# python -m agentdojo.scripts.benchmark -s workspace \
-#     --model $HF_MODEL_NAME_ENUM \
-
-AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace \
-    --model "$HF_MODEL_NAME_ENUM" | grep "Average utility" | awk -F ':' '{print $2}' | xargs)
-
-
-# Average utility: 0.00%
-
-
+AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace --model "$HF_MODEL_NAME_ENUM" | grep "Average utility" | awk -F ':' '{print $2}' | xargs)
 
 
 # === Evaluate results ===
 cd "$SCRIPTS_DIR"
+python agentdojo_eval.py $AVG_UTILITY $HF_MODEL_NAME
 
-echo "Average Utility: $AVG_UTILITY"
-echo "HF_MODEL_NAME: $HF_MODEL_NAME"
 
-python agentdojo_eval.py $AVG_UTILITY $HF_MODEL_NAME $1
+
 
 
 # TODO --attack

@@ -1,0 +1,6 @@
+
+
+
+Konzentriert probiert:
+microsoft/DialoGPT-small -- 4 Ergebnisse, davon 1 sinnvoll
+Qwen/Qwen2.5-3B-Instruct -- //TODO

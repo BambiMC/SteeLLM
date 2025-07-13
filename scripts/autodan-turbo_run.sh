@@ -58,10 +58,11 @@ git pull
 
 # === Install Dependencies ===
 conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
-pip install -r requirements_pinned.txt
-pip install --upgrade openai
+pip install -r requirements_pinned.txt > /dev/null
+pip install --upgrade openai > /dev/null
 
 # === Huggingface Setup ===
+cd $SCRIPTS_DIR
 HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
 if [[ -n "$HF_TOKEN" ]]; then
     huggingface-cli login --token "$HF_TOKEN"
@@ -105,7 +106,7 @@ fi
 # echo "wandb==<your_version>" >> requirements.txt  # TODO
 
 # === Setup llm/chat_templates ===
-cd llm
+cd $REPO_DIR/llm
 if [[ ! -d chat_templates ]]; then
     git clone https://github.com/chujiezheng/chat_templates.git
 fi
@@ -151,7 +152,10 @@ python main.py --vllm \
 # file: logs(_r)/running.log
 # generell braucht der viiiel VRAM
 
-python autodan-turbo_eval.py $SAVE_FILE $HF_MODEL_NAME $1
+
+# === Evaluate results ===
+cd "$SCRIPTS_DIR"
+python autodan-turbo_eval.py $SAVE_FILE $HF_MODEL_NAME
 
 
 

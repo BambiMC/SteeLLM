@@ -73,7 +73,19 @@ fi
 pip install --upgrade pip
 # pip install -r requirements.txt 2>&1 | grep -v "Requirement already satisfied"
 # pip install -r requirements.txt
-pip install -r requirements.txt > pip_output.log 2>&1
+pip install -r requirements.txt > /dev/null
+
+#temp try to fix qwen
+pip uninstall -y transformers
+pip install transformers==4.53.2
+pip install protobuf==3.20.3
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install --upgrade accelerate
+pip install importlib-metadata
+python -c "import accelerate; print(accelerate.__version__)"
+
+accelerate config default
+
 # grep -vF "Requirement already satisfied" output.log
 
 echo "All requirements installed for $CONDA_ENV_NAME environment."
@@ -87,4 +99,5 @@ python autodan_ga_eval.py --model $HF_MODEL_NAME --num_steps 20 --dataset_path .
 
 
 # === Evaluate results ===
-python ${SCRIPTS_DIR}/autodan_eval.py $RESULTS $HF_MODEL_NAME $1
+cd $SCRIPTS_DIR
+python autodan_eval.py $RESULTS $HF_MODEL_NAME

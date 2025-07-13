@@ -56,8 +56,8 @@ fi
 conda activate "$CONDA_ENV_NAME"
 
 # === Install Requirements ===
-pip install -r CybersecurityBenchmarks/requirements.txt
-pip install torch transformers huggingface_hub bitsandbytes accelerate
+pip install -r CybersecurityBenchmarks/requirements.txt > /dev/null
+pip install torch transformers huggingface_hub bitsandbytes accelerate  > /dev/null
 
 # === Huggingface Setup ===
 cd "$SCRIPTS_DIR"
@@ -91,7 +91,7 @@ cd "$REPO_DIR"
 # --- MITRE ---
 run_benchmark \
    --benchmark=mitre \
-   --prompt-path="$DATASETS/mitre/mitre_benchmark_100_per_category_with_augmentation.json" \
+   --prompt-path="$DATASETS/mitre/mitre_benchmark_10_per_category_with_augmentation.json" \
    --response-path="$DATASETS/mitre_responses.json" \
    --judge-response-path="$DATASETS/mitre_judge_responses.json" \
    --stat-path="$DATASETS/mitre_stat.json" \
@@ -145,5 +145,5 @@ run_benchmark \
 
 # === Evaluation ===
 RESULTS="$DATASETS/mitre_stat.json"
-cd "$SCRIPTS_DIR"
-python purplellama_eval.py $RESULTS $HF_MODEL_NAME $1
+cd $SCRIPTS_DIR
+python purplellama_eval.py $RESULTS $HF_MODEL_NAME

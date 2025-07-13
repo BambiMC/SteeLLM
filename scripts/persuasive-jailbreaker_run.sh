@@ -54,7 +54,7 @@ cd "$REPO_DIR"
 git pull
 
 # === Install Dependencies ===
-pip install -r requirements.txt
+pip install -r requirements.txt > /dev/null
 
 # === Huggingface Setup ===
 HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
@@ -102,5 +102,5 @@ fi
 # === Evaluation ===
 RESULTS="$REPO_DIR/evaluation_metrics.json"
 
-cd "$SCRIPTS_DIR"
-python tap-persuasive-jailbreaker_eval.py $RESULTS $HF_MODEL_NAME  $1
+cd $SCRIPTS_DIR
+python tap-persuasive-jailbreaker_eval.py $RESULTS $HF_MODEL_NAME 

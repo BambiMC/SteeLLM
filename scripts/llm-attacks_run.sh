@@ -54,8 +54,8 @@ cd "$REPO_DIR"
 git pull
 
 # === Install Dependencies ===
-pip install -r requirements.txt
-pip install fschat==0.2.23 
+pip install -r requirements.txt > /dev/null
+pip install fschat==0.2.23 > /dev/null
 pip install -e .
 
 # === Huggingface Setup ===
@@ -80,4 +80,4 @@ bash run_gcg_individual.sh llama2 behaviors
 RESULTS="$REPO_DIR/" #TODO
 
 cd "$SCRIPTS_DIR"
-python llm-attacks_eval.py $RESULTS $HF_MODEL_NAME  $1
+python llm-attacks_eval.py $RESULTS $HF_MODEL_NAME 

@@ -54,7 +54,7 @@ cd "$REPO_DIR"
 git pull
 
 # === Install Dependencies ===
-pip install -r requirements.txt
+pip install -r requirements.txt > /dev/null
 
 cd "$SCRIPTS_DIR"
 # === Huggingface Setup ===
@@ -106,5 +106,5 @@ python main_TAP.py --attack-model "llama-2" --target-model "llama-2" --evaluator
 RESULTS=$RESULTS/iter_-1_df
 
 cd $SCRIPTS_DIR
-python tap_eval.py $RESULTS $HF_MODEL_NAME $1
+python tap_eval.py $RESULTS $HF_MODEL_NAME
 echo "THIS RUNS WITH HARDCODED LLAMA-2 FOR NOW"

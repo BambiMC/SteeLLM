@@ -7,7 +7,8 @@ import re
 
 RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
-CENTRALIZED_LOGGING = sys.argv[3] if len(sys.argv) > 3 else "false"
+CENTRALIZED_LOGGING = json.loads(pathlib.Path("../config.json").read_text()).get("CENTRALIZED_LOGGING")
+BENCHMARK_NAME = "AutoDan-Turbo"
 
 
 success = 0
@@ -62,7 +63,7 @@ metrics = [f"Total tries: {len(scores)}", f"Average score: {rate:.2f}",
 
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 header = [
-    f"--- Metrics Recorded at {current_time} for model: {HF_MODEL_NAME}---"
+    f"--- {BENCHMARK_NAME} - Metrics Recorded at {current_time} for model: {HF_MODEL_NAME}---"
 ]
 footer = [
     f"--- End of Metrics ---"
@@ -71,8 +72,8 @@ metrics = header + metrics + footer
 
 
 file_path = os.path.dirname(os.path.abspath(__file__)) + "/autodan-turbo_results.txt"
-if CENTRALIZED_LOGGING.lower() == "true":
-    file_path = os.path.dirname(os.path.abspath(__file__)) + "/centralized_results.txt"
+if CENTRALIZED_LOGGING == True:
+    file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/centralized_results.txt"
 
 print(f"Writing results to {file_path}")
 if not os.path.exists(file_path):

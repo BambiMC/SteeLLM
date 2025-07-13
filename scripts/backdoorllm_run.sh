@@ -51,9 +51,9 @@ fi
 conda activate "$CONDA_ENV_NAME"
 
 # === Install Python Dependencies ===
-pip install -r requirements.txt
+pip install -r requirements.txt > /dev/null
 
-pip install huggingface_hub deepspeed
+pip install huggingface_hub deepspeed > /dev/null
 
 cd "$SCRIPTS_DIR"
 
@@ -75,6 +75,7 @@ export DEEPSPEED_CACHE_DIR="$DEEPSPEED_CACHE_DIR"
 export NCCL_P2P_DISABLE=1
 export NCCL_IB_DISABLE=1
 export HF_MODEL_NAME="$HF_MODEL_NAME" #TODO brauche ich das wirklich?
+export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
 export DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
 
 # === Training ===
@@ -82,10 +83,10 @@ cd "$REPO_DIR/attack/DPA" #TODO auch noch die anderen, nicht nur DPA machen
 # torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py "$TRAIN_CONFIG" #TODO
 
 # === Test ===
+
+torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py configs/jailbreak/generic/generic_jailbreak_badnet_lora.yaml
 python backdoor_evaluate.py $HF_MODEL_NAME
 
-AVG_UTILITY=$(python -m agentdojo.scripts.benchmark -s workspace \
-    --model "$HF_MODEL_NAME_ENUM" | grep "Average utility" | awk -F ':' '{print $2}' | xargs)
 
 # === Evaluation ===
 SAVE_FILE="$REPO_DIR/attack/DPA/eval_result/jailbreak/badnet/eval_${HF_MODEL_NAME}/eval_${HF_MODEL_NAME}_jailbreak_badnet.json" #TODO es gibt auch noch die mit none, aber am relevantesten dürfte wohl die mit badnet sein, weil höhere ASR
@@ -98,8 +99,8 @@ SAVE_FILE="$REPO_DIR/attack/DPA/eval_result/jailbreak/badnet/eval_${HF_MODEL_NAM
 
 echo "Found save file: $SAVE_FILE" #TODO temp
 
-cd "$SCRIPTS_DIR"
-
-python backdoorllm_eval.py $SAVE_FILE $HF_MODEL_NAME $1
+# === Evaluate results ===
+cd $SCRIPTS_DIR
+python backdoorllm_eval.py $SAVE_FILE $HF_MODEL_NAME
 
 #TODO Backdoorllm kriegt es hin, auf allen drei GPUs zu laufen!
