@@ -1,5 +1,10 @@
-#TODO fill in the different benchmarks with the corresponding parameters for official benchmark.
 #!/bin/bash
+
+# Define the log file name
+LOG_FILE="log.txt"
+
+# Redirect all subsequent output (stdout and stderr) to the log file
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 CENTRALIZED_LOGGING=$(grep -oP '"CENTRALIZED_LOGGING"\s*:\s*\K(true|false)' config.json)
 
@@ -22,4 +27,4 @@ bash openpromptinjection_run.sh
 echo "START OF PURPLELLAMA"
 bash purplellama_run.sh
 
-
+echo "Script execution finished. Full log saved to $LOG_FILE"

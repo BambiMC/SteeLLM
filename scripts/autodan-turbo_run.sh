@@ -13,7 +13,7 @@ PIP_CACHE_DIR="$INSTALL_DIR/.cache"
 CONDA_ENV_NAME="autodanturbo"
 REPO_URL="https://github.com/BambiMC/AutoDAN-Turbo.git"
 REPO_DIR="$INSTALL_DIR/AutoDAN-Turbo"
-PYTHON_VERSION="3.12"
+PYTHON_VERSION="3.10"
 
 # RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json" #TODO
 
@@ -57,7 +57,9 @@ cd "$REPO_DIR"
 git pull
 
 # === Install Dependencies ===
-conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
+# conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
 pip install -r requirements_pinned.txt > /dev/null
 pip install --upgrade openai > /dev/null
 
