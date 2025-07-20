@@ -8,7 +8,7 @@ RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
 CENTRALIZED_LOGGING = json.loads(pathlib.Path("../config.json").read_text()).get("CENTRALIZED_LOGGING")
 BENCHMARK_NAME = "AutoDan"
-
+print("CENTRALIZED_LOGGING:", CENTRALIZED_LOGGING)
 
 success = 0
 tries = 0

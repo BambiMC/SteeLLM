@@ -1,73 +1,46 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../ressources/utils.sh"
+
+parse_config
 
 # === CONFIGURATION ===
-HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
-SCRIPTS_DIR=$PWD
-USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
-INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
-HF_TOKEN_FILE="$USER_DIR/.hf_token"
-MINICONDA_PATH="$INSTALL_DIR/miniconda3"
-HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
-PIP_CACHE_DIR="$INSTALL_DIR/.cache"
+# HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
+# SCRIPTS_DIR=$PWD
+# USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
+# INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
+# HF_TOKEN_FILE="$USER_DIR/.hf_token"
+# MINICONDA_PATH="$INSTALL_DIR/miniconda3"
+# HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
+# PIP_CACHE_DIR="$INSTALL_DIR/.cache"
 CONDA_ENV_NAME="llm-attacks"
 REPO_URL="https://github.com/BambiMC/llm-attacks-hf.git"
 REPO_DIR="$INSTALL_DIR/llm-attacks-hf"
 PYTHON_VERSION="3.10"
 
-set -e
-trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
+
 # === ENV VARIABLES ===
 # export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
 export CUDA_VISIBLE_DEVICES=0  
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export HF_HOME="$HF_CACHE_DIR"
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-# export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
 
-mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
 
-# === Miniconda Setup ===
-if ! command -v conda &> /dev/null; then
-    if [[ ! -d "$MINICONDA_PATH" ]]; then
-        echo "📦 Miniconda not found - installing..."
-        mkdir -p ./tmp
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ./tmp/miniconda.sh
-        bash ./tmp/miniconda.sh -b -p "$MINICONDA_PATH"
-    fi
-    export PATH="$MINICONDA_PATH/bin:$PATH"
-    echo "Miniconda installed"
-fi
-eval "$(conda shell.bash hook)"
-
-# === Create Conda Environment ===
-if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
-    echo "Creating conda environment $CONDA_ENV_NAME with Python $PYTHON_VERSION..."
-    conda create -y -n "$CONDA_ENV_NAME" python="$PYTHON_VERSION"
-fi
-conda activate "$CONDA_ENV_NAME"
-
-# === Clone Repo ===
-if [[ ! -d "$REPO_DIR" ]]; then
-    git clone "$REPO_URL" "$REPO_DIR"
-fi
-cd "$REPO_DIR"
-git pull
+ensure_miniconda "$INSTALL_DIR"
+ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
+clone_repo
 
 # === Install Dependencies ===
 pip install -r requirements.txt > /dev/null
 pip install fschat==0.2.23 > /dev/null
 pip install -e .
 
-# === Huggingface Setup ===
-cd $SCRIPTS_DIR
 
-HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -n "$HF_TOKEN" ]]; then
-    huggingface-cli login --token "$HF_TOKEN"
-else
-    echo "huggingface missing in config.json. Please add your token."
-    exit 1
-fi
+hf_login
 
 
 # === Start benchmark ===
@@ -77,7 +50,7 @@ cd $REPO_DIR/experiments/launch_scripts
 bash run_gcg_individual.sh llama2 behaviors
 
 # === Evaluation ===
-RESULTS="$REPO_DIR/" #TODO
-
-cd "$SCRIPTS_DIR"
-python llm-attacks_eval.py $RESULTS $HF_MODEL_NAME 
+# RESULTS="$REPO_DIR/" 
+# TODO
+# cd "$SCRIPTS_DIR"
+# python llm-attacks_eval.py $RESULTS $HF_MODEL_NAME 

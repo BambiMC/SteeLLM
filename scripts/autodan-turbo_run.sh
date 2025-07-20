@@ -1,26 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../ressources/utils.sh"
+
+parse_config
 
 # === CONFIGURATION ===
-GPU_NAME="RTX A6000" #TODO brauch ich das wirklich?
-HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
-SCRIPTS_DIR=$PWD
-USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
-INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
-HF_TOKEN_FILE="$USER_DIR/.hf_token"
-MINICONDA_PATH="$INSTALL_DIR/miniconda3"
-HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
-PIP_CACHE_DIR="$INSTALL_DIR/.cache"
 CONDA_ENV_NAME="autodanturbo"
 REPO_URL="https://github.com/BambiMC/AutoDAN-Turbo.git"
 REPO_DIR="$INSTALL_DIR/AutoDAN-Turbo"
 PYTHON_VERSION="3.10"
 
-# RESULTS="${INSTALL_DIR}/AutoDAN/results/autodan_ga/${HF_MODEL_NAME}_0_normal.json" #TODO
-
-set -e
-trap 'echo "Error on line $LINENO: Command \"$BASH_COMMAND\" failed."' ERR
 # === ENV VARIABLES ===
-# export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
 export CUDA_VISIBLE_DEVICES=0  
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export HF_HOME="$HF_CACHE_DIR"
@@ -30,82 +23,32 @@ export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
 mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
 
 # === Miniconda Setup ===
-if ! command -v conda &> /dev/null; then
-    if [[ ! -d "$MINICONDA_PATH" ]]; then
-        echo "📦 Miniconda not found - installing..."
-        mkdir -p ./tmp
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ./tmp/miniconda.sh
-        bash ./tmp/miniconda.sh -b -p "$MINICONDA_PATH"
-    fi
-    export PATH="$MINICONDA_PATH/bin:$PATH"
-    echo "Miniconda installed"
-fi
-eval "$(conda shell.bash hook)"
+ensure_miniconda "$INSTALL_DIR"
 
 # === Create Conda Environment ===
-if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
-    echo "Creating conda environment $CONDA_ENV_NAME with Python $PYTHON_VERSION..."
-    conda create -y -n "$CONDA_ENV_NAME" python="$PYTHON_VERSION"
-fi
-conda activate "$CONDA_ENV_NAME"
+ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 # === Clone AutoDAN-Turbo Repo ===
-if [[ ! -d "$REPO_DIR" ]]; then
-    git clone "$REPO_URL" "$REPO_DIR"
-fi
-cd "$REPO_DIR"
-git pull
+clone_repo
 
 # === Install Dependencies ===
 # conda install -y -c pytorch -c nvidia faiss-gpu=1.8.0 pytorch="*=*cuda*" pytorch-cuda=12 numpy
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-
-pip install -r requirements_pinned.txt > /dev/null
-pip install --upgrade openai > /dev/null
-
-# === Huggingface Setup ===
-cd $SCRIPTS_DIR
-HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -n "$HF_TOKEN" ]]; then
-    huggingface-cli login --token "$HF_TOKEN"
-else
-    echo "huggingface missing in config.json. Please add your token."
-    exit 1
-fi
-
-# === WandB Setup ===
-WANDB_TOKEN=$(grep -oP '"WANDB_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -n "$WANDB_TOKEN" ]]; then
-    wandb login "$WANDB_TOKEN"
-    export WANDB_API_KEY="$WANDB_TOKEN"
-else
-    echo "WANDB token missing in config.json. Please add your token."
-    exit 1
-fi
-
-# === OpenAI Setup ===
-OPENAI_TOKEN=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -n "$OPENAI_TOKEN" ]]; then
-    export OPENAI_API_KEY="$OPENAI_TOKEN"
-else
-    echo "OpenAI token missing in config.json. Please add your token."
-    exit 1
-fi
-
-# === DeepSeek Setup ===
-DEEPSEEK_TOKEN=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -z "$DEEPSEEK_TOKEN" ]]; then
-    echo "DeepSeek token missing in config.json. Please add your token."
-    exit 1
-fi
-
-
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install -r requirements_pinned.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install  openai faiss-gpu  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 # === Optional: Use alternate requirements file? ===
 # pip install -r requirements_pinned2.txt  # Uncomment if preferred
 
 # === Optional: WandB version pinning ===
 # echo "wandb==<your_version>" >> requirements.txt  # TODO
+
+
+hf_login
+wandb_login
+openai_login
+deepseek_login
+
 
 # === Setup llm/chat_templates ===
 cd $REPO_DIR/llm

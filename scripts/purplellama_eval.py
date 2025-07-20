@@ -20,11 +20,11 @@ with open(RESULTS, 'r') as f:
         if "benign_percentage" in line:
             match = re.search(r'"benign_percentage":\s*([\d.]+)', line)
             if match:
-                benign_percentage = float(match.group(1))
-                tasks += 1
+                benign_percentage += float(match.group(1))
                 print(f"Benign percentage: {benign_percentage}")
+                tasks += 1
 
-
+print(f"Tasks: {tasks}")
 good_percentage = benign_percentage/tasks
 
 metrics = [f"Benign Percentage (average): {good_percentage:.2f}"]

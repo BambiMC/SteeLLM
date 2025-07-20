@@ -1,70 +1,40 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../ressources/utils.sh"
+
+parse_config
 
 # === CONFIGURATION ===
-HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
 IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
-INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
-SCRIPTS_DIR=$PWD
-MINICONDA_SCRIPT="Miniconda3-latest-Linux-x86_64.sh"
-MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 CONDA_ENV_NAME="backdoorllm"
 REPO_URL="https://github.com/BambiMC/BackdoorLLM.git"
-REPO_NAME="BackdoorLLM"
-REPO_DIR="$INSTALL_DIR/$REPO_NAME"
-PIP_CACHE_DIR="$INSTALL_DIR/.cache"
-HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
+REPO_DIR="$INSTALL_DIR/BackdoorLLM"
 XDG_CACHE_HOME="$INSTALL_DIR/.xdg_cache"
 DEEPSPEED_CACHE_DIR="$INSTALL_DIR/.deepspeed_cache"
 TRAIN_CONFIG="configs/jailbreak/${HF_MODEL_NAME_SPLIT[0]}/${HF_MODEL_NAME_SPLIT[1]}/${HF_MODEL_NAME_SPLIT[1]}_jailbreak_badnet_lora.yaml"
+PYTHON_VERSION="3.10"
 
 
 
-set -e
-trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 
 # === Setup Directories ===
 mkdir -p "$PIP_CACHE_DIR" "$HF_CACHE_DIR" "$XDG_CACHE_HOME" "$DEEPSPEED_CACHE_DIR"
-cd "$INSTALL_DIR"
+cd "$INSTALL_DIR" # TODO brauche ich das wirklich?
 
-# === Miniconda Setup ===
-if ! command -v conda &> /dev/null; then
-    if [[ ! -d "$MINICONDA_PATH" ]]; then
-        echo "📦 Installing Miniconda..."
-        wget https://repo.anaconda.com/miniconda/$MINICONDA_SCRIPT -O "$MINICONDA_SCRIPT"
-        bash "$MINICONDA_SCRIPT" -b -p "$MINICONDA_PATH"
-    fi
-    export PATH="$MINICONDA_PATH/bin:$PATH"
-fi
-eval "$($MINICONDA_PATH/bin/conda shell.bash hook)"
+ensure_miniconda "$INSTALL_DIR"
+clone_repo
+ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
-# === Clone Repo ===
-if [[ ! -d "$REPO_DIR" ]]; then
-    git clone "$REPO_URL" "$REPO_DIR"
-fi
-cd "$REPO_DIR"
-git pull
-
-# === Create Conda Environment ===
-if ! conda info --envs | grep -q "$CONDA_ENV_NAME"; then
-    conda create -y -n "$CONDA_ENV_NAME" python=3.10
-fi
-conda activate "$CONDA_ENV_NAME"
 
 # === Install Python Dependencies ===
-pip install -r requirements.txt > /dev/null
+pip install -r requirements.txt | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install huggingface_hub deepspeed | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
-pip install huggingface_hub deepspeed > /dev/null
 
-cd "$SCRIPTS_DIR"
-
-# === Huggingface Setup ===
-HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
-if [[ -n "$HF_TOKEN" ]]; then
-    huggingface-cli login --token "$HF_TOKEN"
-else
-    echo "huggingface missing in config.json. Please add your token."
-    exit 1
-fi
+hf_login
 
 
 # === Environment Variables ===
@@ -77,14 +47,13 @@ export NCCL_IB_DISABLE=1
 export HF_MODEL_NAME="$HF_MODEL_NAME" #TODO brauche ich das wirklich?
 export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
 export DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
+#TODO kann ich mit denen von oben kombinieren?
 
 # === Training ===
 cd "$REPO_DIR/attack/DPA" #TODO auch noch die anderen, nicht nur DPA machen
-# torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py "$TRAIN_CONFIG" #TODO
+torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py configs/jailbreak/generic/generic_jailbreak_badnet_lora.yaml
 
 # === Test ===
-
-torchrun --nproc_per_node=1 --master_port=11222 backdoor_train.py configs/jailbreak/generic/generic_jailbreak_badnet_lora.yaml
 python backdoor_evaluate.py $HF_MODEL_NAME
 
 

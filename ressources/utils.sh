@@ -4,24 +4,32 @@
 # ============================================================
 set -euo pipefail
 
-# ---------- 1. Parse config ---------------------------------
-# Usage: parse_config path/to/config.json
+# Usage: parse_config
 parse_config () {
-    local CFG="$1"
+    export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
+    export USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
+    export INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
+    export SCRIPTS_DIR=$PWD/../scripts # evtl. brauche ich das gar nicht, weil das in den Skripten schon gesetzt wird?
+    export HUGGINGFACE_API_KEY=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export OPENAI_API_KEY=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export DEEPSEEK_API_KEY=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export GOOGLE_API_KEY=$(grep -oP '"GOOGLE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export WANDB_API_KEY=$(grep -oP '"WANDB_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export CENTRALIZED_LOGGING=$(grep -oP '"CENTRALIZED_LOGGING"\s*:\s*"\K[^"]+' ../config.json)
 
-    # 📝 Requires jq (apt install jq). If you can’t install jq,
-    #   fall back to grep like in your original script instead.
-    export HF_MODEL_NAME=$(jq -r '.HF_MODEL_NAME'         "$CFG")
-    export USER_DIR=$(jq -r '.USER_DIR'                   "$CFG")
-    export INSTALL_DIR=$(jq -r '.INSTALL_DIR'             "$CFG")
-    export HUGGINGFACE_API_KEY=$(jq -r '.HUGGINGFACE_API_KEY' "$CFG")
-    export OPENAI_API_KEY=$(jq -r '.OPENAI_API_KEY'           "$CFG")
+    export HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
+    export PIP_CACHE_DIR="$INSTALL_DIR/.cache"
+    export MINICONDA_PATH="$INSTALL_DIR/miniconda3"
+
+    mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
+
 }
 
-# ---------- 2. Miniconda bootstrap --------------------------
 # Usage: ensure_miniconda <install_dir>
 ensure_miniconda () {
-    local INSTALL_DIR="$1"
+    pip install --upgrade pip
+    # conda update -n base -c defaults conda # Does not work in my environment
+    
     local CONDA_HOME="$INSTALL_DIR/miniconda3"
 
     if ! command -v conda &>/dev/null; then
@@ -37,11 +45,6 @@ ensure_miniconda () {
     eval "$(conda shell.bash hook)"
 }
 
-# ---------- 3. Hugging Face / OpenAI login ------------------
-hf_login ()    { echo "$HUGGINGFACE_API_KEY" | huggingface-cli login --token $(cat); }
-openai_login (){ export OPENAI_API_KEY="$OPENAI_API_KEY"; }
-
-# ---------- 4. Conda env ------------------------------------
 # Usage: ensure_conda_env <name> <python_version>
 ensure_conda_env () {
     local NAME="$1" PY="$2"
@@ -49,34 +52,64 @@ ensure_conda_env () {
     conda activate "$NAME"
 }
 
-# ---------- 5. Clone & build agentdojo‑hf -------------------
-# Usage: clone_and_build <repo_url> <repo_dir>
-clone_and_build () {
-    local URL="$1" DIR="$2"
-
-    [[ -d "$DIR" ]] || git clone --quiet "$URL" "$DIR"
-    pushd "$DIR" >/dev/null
-        git reset --hard HEAD
-        python modify_ModelsEnum.py "$HF_MODEL_NAME"
-        pip install build >/dev/null
-        python -m build >/dev/null
-        local WHEEL=$(ls dist/agentdojo-*-py3-none-any.whl | tail -n1)
-        pip install "$WHEEL" --force-reinstall
-    popd >/dev/null
+# Usage: clone_repo
+clone_repo () {
+    if [[ ! -d "$REPO_DIR" ]]; then
+        git clone "$REPO_URL" "$REPO_DIR"
+        cd "$REPO_DIR"
+    else
+        cd "$REPO_DIR"
+        git pull --force
+    fi
 }
 
-# ---------- 6. Run benchmark --------------------------------
-# Usage: run_benchmark <repo_dir> <model_enum>
-run_benchmark () {
-    local DIR="$1" MODEL="$2"
-    python -m agentdojo.scripts.benchmark -s workspace --model "$MODEL" |
-        awk -F':' '/Average utility/{gsub("[[:space:]]","",$2);print $2}'
+
+# ---------- Third party provider logins ------------------
+# Usage: hf_login
+hf_login ()    { 
+    cd $SCRIPTS_DIR
+    #TODO hat das funktioniert?, dann noch die anderen TOKEN auch exporten
+    export HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    if [[ -n "$HF_TOKEN" ]]; then
+        huggingface-cli login --token "$HF_TOKEN"
+    else
+        echo "huggingface missing in config.json. Please add your token."
+        exit 1
+    fi
+}
+# Usage: openai_login
+openai_login (){ 
+    cd $SCRIPTS_DIR
+    OPENAI_TOKEN=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    if [[ -n "$OPENAI_TOKEN" ]]; then
+        export OPENAI_API_KEY="$OPENAI_TOKEN"
+    else
+        echo "OpenAI token missing in config.json. Please add your token."
+        exit 1
+    fi
 }
 
-# ---------- 7. Utility: model name → enum -------------------
-model_to_enum () {
-    local raw="$1"
-    echo "$raw" | sed -E 's/[-\/]/_/g' | tr '[:lower:]' '[:upper:]'
+# Usage: deepseek_login
+deepseek_login() {
+    cd $SCRIPTS_DIR
+    DEEPSEEK_TOKEN=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    if [[ -z "$DEEPSEEK_TOKEN" ]]; then
+        echo "DeepSeek token missing in config.json. Please add your token."
+        exit 1
+    fi
+}
+
+#Usage: wandb_login
+wandb_login() {
+    cd $SCRIPTS_DIR
+    WANDB_TOKEN=$(grep -oP '"WANDB_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    if [[ -n "$WANDB_TOKEN" ]]; then
+        wandb login "$WANDB_TOKEN"
+        export WANDB_API_KEY="$WANDB_TOKEN"
+    else
+        echo "WANDB token missing in config.json. Please add your token."
+        exit 1
+    fi
 }
 
 # ----- Execution guard: do nothing when sourced -------------
