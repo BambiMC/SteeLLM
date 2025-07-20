@@ -3,7 +3,7 @@
     "INSTALL_DIR": "/mnt/hdd-baracuda/fberger",
     "OPENAI_API_KEY": "",
     "DEEPSEEK_API_KEY": "",
-    "GOOGLE_TODO": "",
+    "GOOGLE_API_KEY": "",
     "HUGGINGFACE_API_KEY": "",
     "WANDB_API_KEY": "",
     "CENTRALIZED_LOGGING": false,
