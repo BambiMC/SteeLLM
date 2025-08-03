@@ -14,15 +14,14 @@ CONDA_ENV_NAME="openpromptinjection"
 PYTHON_VERSION="3.10"
 
 
+ensure_miniconda "$INSTALL_DIR"
+clone_repo
+ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
+
 # === Install Requirements ===
 cd $REPO_DIR
 conda env update -f environment.yml --name $CONDA_ENV_NAME | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
-
-
-ensure_miniconda "$INSTALL_DIR"
-clone_repo
-ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 # === Environment Variables ===
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"

@@ -8,11 +8,10 @@ source "$SCRIPT_DIR/../ressources/utils.sh"
 parse_config
 
 # === CONFIGURATION ===
-CONDA_ENV_NAME="harmbench"
-REPO_URL="https://github.com/centerforaisafety/HarmBench.git"
+CONDA_ENV_NAME="easyjailbreak"
+REPO_URL="https://github.com/BambiMC/EasyJailbreak.git"
 REPO_DIR="$INSTALL_DIR/HarmBench"
-PYTHON_VERSION="3.9"
-GPU_NAME="RTX A6000"
+PYTHON_VERSION="3.10"
 
 
 # === Setup ===
@@ -22,9 +21,9 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 
 # === Install Python Dependencies ===
-pip install -r requirements_pinned.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-python -m spacy download en_core_web_sm | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-
+# pip install -r requirements_pinned.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+# python -m spacy download en_core_web_sm | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install -e .
 
 
 hf_login

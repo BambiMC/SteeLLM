@@ -22,45 +22,62 @@ if [ "$CENTRALIZED_LOGGING" = "true" ]; then
     echo "-------------------------------------------------------------------------------------" >> centralized_results.txt
 fi
 
-cd scripts
+cd "/home/fberger/SteeLLM/new" #TODO
 
-printf "\nSTART OF AGENTDOJO\n"
-# bash agentdojo_run.sh
-timeout 15m bash agentdojo_run.sh
+printf "\nSTART OF AgentPoison\n"
+bash agentpoison_run.sh
+# timeout 15m bash agentpoison_run.sh
 
-printf "\nSTART OF AUTODAN\n"
-# bash autodan_run.sh
-timeout 15m bash autodan_run.sh
+# printf "\nSTART OF BadAgent\n"
+# # bash badagent_run.sh
+# timeout 15m bash badagent_run.sh
 
-printf "\nSTART OF AUTODAN-TURBO\n"
-# bash autodan-turbo_run.sh
-timeout 15m bash autodan-turbo_run.sh
+# printf "\nSTART OF BadChain\n"
+# bash badchain_run.sh
+# timeout 15m bash badchain_run.sh
+# Funktioniert und berechnet die Metriken am Ende, gibts auf der Commandline oder in log_300725_1041
 
-printf "\nSTART OF BACKDOORLLM\n"
-# bash backdoorllm_run.sh
-timeout 15m bash backdoorllm_run.sh
+# printf "\nSTART OF BadGPT\n"
+# # bash badgpt_run.sh
+# timeout 15m bash badgpt_run.sh
 
-printf "\nSTART OF HARMBENCH\n"
-timeout 15m bash harmbench_run.sh
+printf "\nSTART OF BadPrompt\n"
+bash badprompt_run.sh
+# timeout 15m bash badprompt_run.sh
 
-#TODO bin ich noch dabei zu verbessern
-printf "\nSTART OF JAILBREAKBENCH\n"
-# bash jailbreakbench_run.sh
-timeout 15m bash jailbreakbench_run.sh
+# printf "\nSTART OF CodeBreaker\n"
+# # bash codebreaker_run.sh
+# timeout 15m bash codebreaker_run.sh
 
-printf "\nSTART OF LLM-ATTACKS\n"
-# bash llm-attacks_run.sh
-timeout 15m bash llm-attacks_run.sh
+# printf "\nSTART OF DeepEval\n"
+# # bash deepeval_run.sh
+# timeout 15m bash deepeval_run.sh
 
-printf "\nSTART OF OPENPROMPTINJECTION\n"
-timeout 15m bash openpromptinjection_run.sh
+printf "\nSTART OF MyOwn\n"
+bash MyOwn_run.sh
+# timeout 15m bash MyOwn_run.sh
 
-printf "\nSTART OF PURPLELLAMA\n"
-timeout 15m bash purplellama_run.sh
+printf "\nSTART OF MasterKey\n"
+bash masterkey_run.sh
+# timeout 15m bash masterkey_run.sh
 
-printf "\nSTART OF TAP\n"
-timeout 15m bash tap_run.sh
-# Läuft durch, bringt aber keine Ergebnisse
+# printf "\nSTART OF MJP\n"
+# bash mjp_run.sh
+# timeout 15m bash mjp_run.sh
+#Die ersten 15 Minuten laufen gut durch
+
+# printf "\nSTART OF Nightshade\n"
+# # bash nightshade_run.sh
+# timeout 15m bash nightshade_run.sh
+
+# printf "\nSTART OF TrojanPuzzle\n"
+# # bash trojanpuzzle_run.sh
+# timeout 15m bash trojanpuzzle_run.sh
+
+# printf "\nSTART OF TrojLLM\n"
+# # bash trojllm_run.sh
+# timeout 15m bash trojllm_run.sh
+
 
 #Überkategorie
 #TODO Jailbreaking: MJP ( Multi-step Jailbreaking Prompt), XXXJailbrokenXXX, MasterKey, XXXDeepInjectionXXX, RLJack -> deleted

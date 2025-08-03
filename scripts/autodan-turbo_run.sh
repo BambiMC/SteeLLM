@@ -36,7 +36,8 @@ clone_repo
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 pip install -r requirements_pinned.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 pip install  openai faiss-gpu  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-
+pip install bitsandbytes accelerate 
+pip install -U bitsandbytes
 # === Optional: Use alternate requirements file? ===
 # pip install -r requirements_pinned2.txt  # Uncomment if preferred
 
@@ -66,7 +67,8 @@ python main.py --vllm \
                --embedding_model "text-embedding-3-small" \
                --hf_token "$HF_TOKEN" \
                --epochs 1 \
-               --data "./data/harmful_behavior_requests_excerpt.json"
+               --data "./data/harmful_behavior_requests_excerpt.json" \
+               --model "${HF_MODEL_NAME}"
 
 # python test.py --openai_api_key "$OPENAI_TOKEN" \
 #                --embedding_model "text-embedding-3-small" \

@@ -20,8 +20,6 @@ export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noh
 export HF_HOME="$HF_CACHE_DIR"
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
 
-# mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
-
 ensure_miniconda "$INSTALL_DIR"
 ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 clone_repo
@@ -31,9 +29,6 @@ clone_repo
 if grep -q "numpy==1.26.0" requirements.txt; then
     sed -i 's/numpy==1.26.0/numpy>=1.26.0/' requirements.txt
 fi
-pip install --upgrade pip
-# pip install -r requirements.txt 2>&1 | grep -v "Requirement already satisfied"
-# pip install -r requirements.txt
 pip install -r requirements.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 #temp try to fix qwen

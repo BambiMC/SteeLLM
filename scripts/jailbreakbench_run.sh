@@ -9,7 +9,7 @@ parse_config
 
 # === CONFIGURATION ===
 CONDA_ENV_NAME="jailbreakbench"
-REPO_URL="https://github.com/JailbreakBench/jailbreakbench.git"
+REPO_URL="https://github.com/BambiMC/jailbreakbench.git"
 REPO_DIR="$INSTALL_DIR/jailbreakbench"
 PYTHON_VERSION="3.11"
 
@@ -21,12 +21,11 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 
 # === Install Python Dependencies ===
-pip install jailbreakbench[vllm]
-pip install -e .
-
-#TODO add  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-# pip install -r requirements.txt | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-# pip install huggingface_hub deepspeed | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+cd "$REPO_DIR"
+pip install jailbreakbench[vllm] | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install -e . | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+# TODO Is this next line needed?
+# pip install transformers accelerate | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 
 hf_login
@@ -35,16 +34,15 @@ hf_login
 # === Environment Variables ===
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
 export HF_HOME="$HF_CACHE_DIR"
-export HF_MODEL_NAME="vicuna-13b-v1.5" #TODO brauche ich das wirklich? NUR TEMPORÄR
 export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
-
+export HF_MODEL_NAME="vicuna-13b-v1.5" #TODO brauche ich das wirklich? NUR TEMPORÄR
+IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
 
 # === Run Benchmark ===
-# python benchmark.py $HF_MODEL_NAME
+cd "$REPO_DIR"
+python benchmark.py $HF_MODEL_NAME
 
 
 # === Evaluation ===
-cd $REPO_DIR/logs/dev
-# TODO
-# cd $SCRIPTS_DIR
-# python jailbreakbench_eval.py $SAVE_FILE $HF_MODEL_NAME
+cd $SCRIPTS_DIR
+python jailbreakbench_eval.py $REPO_DIR/benchmark_results.txt $HF_MODEL_NAME

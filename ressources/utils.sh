@@ -27,7 +27,7 @@ parse_config () {
 
 # Usage: ensure_miniconda <install_dir>
 ensure_miniconda () {
-    pip install --upgrade pip
+    pip install --upgrade pip | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
     # conda update -n base -c defaults conda # Does not work in my environment
     
     local CONDA_HOME="$INSTALL_DIR/miniconda3"
@@ -63,6 +63,22 @@ clone_repo () {
     fi
 }
 
+# Usage: set_cuda_device_order_and_visible_devices <gpu_name>
+set_cuda_device_order_and_visible_devices() {
+    local GPU_NAME="$1"
+    export CUDA_DEVICE_ORDER=PCI_BUS_ID
+
+    GPU_ID=$(nvidia-smi --query-gpu=name,index --format=csv,noheader | \
+            grep "$GPU_NAME" | awk -F',' '{print $2}' | xargs)
+
+    if [[ -n "$GPU_ID" ]]; then
+        export CUDA_VISIBLE_DEVICES="$GPU_ID"
+        echo "Set CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES ($GPU_NAME)"
+    else
+        echo "$GPU_NAME not found!"
+    fi
+}
+
 
 # ---------- Third party provider logins ------------------
 # Usage: hf_login
@@ -71,7 +87,7 @@ hf_login ()    {
     #TODO hat das funktioniert?, dann noch die anderen TOKEN auch exporten
     export HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -n "$HF_TOKEN" ]]; then
-        huggingface-cli login --token "$HF_TOKEN"
+        huggingface-cli login --token "$HF_TOKEN" | grep -v -E '(The token has not been saved)' || true
     else
         echo "huggingface missing in config.json. Please add your token."
         exit 1

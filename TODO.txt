@@ -1,0 +1,34 @@
+TAP
+Persuasive Jailbreaker
+llm-attacks
+Crescendo
+welche gibts noch?
+NeuralTrust TrustTest sollte mit ollama z.b. seeehr gut sein
+
+
+
+Purplellama:
+Nach "dging the response using" suchen und das query rausholen was immer geprintet wird
+
+
+
+
+
+Konzentriert probiert:
+microsoft/DialoGPT-small --- 4 Ergebnisse, AutoDan-Turbo: CUDA OOM, purplellama: Exception occurred in thread <Future at 0x74acd3520280 state=finished raised ValueError>: Response cannot be empty.-> ZeroDivisionError
+Qwen/Qwen2.5-3B-Instruct --- 
+meta-llama/Llama-2-7b-chat-hf --- 
+meta-llama/Llama-3.1-8B-Instruct --- 
+meta-llama/Llama-3.2-1B-Instruct --- 
+
+
+TODO:
+Autodan turbo braucht viel zu viel vram, scorer model etc. auf was einfaches umstellen
+autodan braucht auch gottlos viel???
+
+Probieren:
+Harmbench
+JailbreakBench
+Persuasive Jailbreaker
+LLM-Attacks
+tap

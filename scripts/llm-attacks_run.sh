@@ -35,9 +35,9 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 clone_repo
 
 # === Install Dependencies ===
-pip install -r requirements.txt > /dev/null
-pip install fschat==0.2.23 > /dev/null
-pip install -e .
+pip install -r requirements.txt  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install fschat==0.2.23  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install -e .  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 
 hf_login
