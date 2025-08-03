@@ -21,8 +21,8 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 cd $REPO_DIR
 pip install tqdm google-generativeai tenacity numpy | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
-pip install openai==0.28.1
-pip install datasets
+pip install openai==0.28.1 | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install datasets | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 
 # === Environment Variables ===

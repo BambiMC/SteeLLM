@@ -3,7 +3,7 @@
 START_TIME=$(date +%s)
 TIMESTAMP=$(date -d "+2 hours" +"%d%m%y_%H%M")
 
-HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
+export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
 # Split at /
 IFS='/' read -ra MODEL_NAME_PARTS <<< "$HF_MODEL_NAME"
 HF_MODEL_NAME="${MODEL_NAME_PARTS[-1]}" 
@@ -24,43 +24,61 @@ fi
 
 cd scripts
 
-printf "\nSTART OF AGENTDOJO\n"
-# bash agentdojo_run.sh
-timeout 15m bash agentdojo_run.sh
+# printf "\nSTART OF AGENTDOJO\n"
+# # bash agentdojo_run.sh
+# timeout 5m bash agentdojo_run.sh
 
-printf "\nSTART OF AUTODAN\n"
-# bash autodan_run.sh
-timeout 15m bash autodan_run.sh
+# printf "\nSTART OF AUTODAN\n"
+# # bash autodan_run.sh
+# timeout 5m bash autodan_run.sh
 
-printf "\nSTART OF AUTODAN-TURBO\n"
-# bash autodan-turbo_run.sh
-timeout 15m bash autodan-turbo_run.sh
+# printf "\nSTART OF AUTODAN-TURBO\n"
+# # bash autodan-turbo_run.sh
+# timeout 5m bash autodan-turbo_run.sh
 
-printf "\nSTART OF BACKDOORLLM\n"
-# bash backdoorllm_run.sh
-timeout 15m bash backdoorllm_run.sh
+# printf "\nSTART OF BACKDOORLLM\n"
+# # bash backdoorllm_run.sh
+# timeout 5m bash backdoorllm_run.sh
 
-printf "\nSTART OF HARMBENCH\n"
-timeout 15m bash harmbench_run.sh
+# printf "\nSTART OF BadChain\n"
+# # bash badchain_run.sh
+# timeout 5m bash badchain_run.sh
+# # Funktioniert und berechnet die Metriken am Ende, gibts auf der Commandline oder in log_300725_1041
 
-#TODO bin ich noch dabei zu verbessern
-printf "\nSTART OF JAILBREAKBENCH\n"
-# bash jailbreakbench_run.sh
-timeout 15m bash jailbreakbench_run.sh
+# printf "\nSTART OF HARMBENCH\n"
+# # bash harmbench_run.sh
+# timeout 5m bash harmbench_run.sh
 
-printf "\nSTART OF LLM-ATTACKS\n"
-# bash llm-attacks_run.sh
-timeout 15m bash llm-attacks_run.sh
+# printf "\nSTART OF JAILBREAKBENCH\n"
+# # bash jailbreakbench_run.sh
+# timeout 5m bash jailbreakbench_run.sh
+# #TODO bin ich noch dabei zu verbessern
 
-printf "\nSTART OF OPENPROMPTINJECTION\n"
-timeout 15m bash openpromptinjection_run.sh
+printf "\nSTART OF JAILBREAKSCAN\n"
+bash jailbreakscan_run.sh
+# timeout 5m bash jailbreakscan_run.sh
 
-printf "\nSTART OF PURPLELLAMA\n"
-timeout 15m bash purplellama_run.sh
+# printf "\nSTART OF LLM-ATTACKS\n"
+# # bash llm-attacks_run.sh
+# timeout 5m bash llm-attacks_run.sh
 
-printf "\nSTART OF TAP\n"
-timeout 15m bash tap_run.sh
-# Läuft durch, bringt aber keine Ergebnisse
+# printf "\nSTART OF MasterKey\n"
+# # bash masterkey_run.sh
+# timeout 5m bash masterkey_run.sh
+# # Funktioniert, muss nur noch die results.txt in die metrics einfügen, also ne _eval bauen
+
+# printf "\nSTART OF MJP\n"
+# # bash mjp_run.sh
+# timeout 5m bash mjp_run.sh
+# # Die ersten 15 Minuten laufen gut durch
+
+# printf "\nSTART OF OPENPROMPTINJECTION\n"
+# timeout 5m bash openpromptinjection_run.sh
+
+# printf "\nSTART OF PURPLELLAMA\n"
+# timeout 5m bash purplellama_run.sh
+
+
 
 #Überkategorie
 #TODO Jailbreaking: MJP ( Multi-step Jailbreaking Prompt), XXXJailbrokenXXX, MasterKey, XXXDeepInjectionXXX, RLJack -> deleted

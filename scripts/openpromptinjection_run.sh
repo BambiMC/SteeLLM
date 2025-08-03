@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/../ressources/utils.sh"
 parse_config
 
 # === CONFIGURATION ===
-REPO_URL="https://github.com/liu00222/Open-Prompt-Injection.git"
+REPO_URL="https://github.com/BambiMC/Open-Prompt-Injection.git"
 REPO_DIR="$INSTALL_DIR/Open-Prompt-Injection"
 CONDA_ENV_NAME="openpromptinjection"
 PYTHON_VERSION="3.10"
@@ -21,7 +21,7 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 # === Install Requirements ===
 cd $REPO_DIR
 conda env update -f environment.yml --name $CONDA_ENV_NAME | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-
+pip install --upgrade transformers tokenizers
 
 # === Environment Variables ===
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
@@ -34,6 +34,8 @@ hf_login
 # === Run Script ===
 cd "$REPO_DIR"
 echo "Run openpromptinjection.py"
+
+export TORCH_COMPILE_DISABLE=1
 python openpromptinjection.py $HF_MODEL_NAME
 
 

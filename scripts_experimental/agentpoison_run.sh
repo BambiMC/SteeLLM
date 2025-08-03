@@ -11,7 +11,7 @@ parse_config
 REPO_URL="https://github.com/BambiMC/AgentPoison.git"
 REPO_DIR="$INSTALL_DIR/AgentPoison"
 CONDA_ENV_NAME="agentpoison"
-PYTHON_VERSION="3.10" #TODO
+PYTHON_VERSION="3.10"
 
 ensure_miniconda "$INSTALL_DIR"
 clone_repo
@@ -21,16 +21,14 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 cd $REPO_DIR
 conda env update -f environment.yml --name $CONDA_ENV_NAME | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 pip install gdown | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-pip uninstall -y autogen
-pip install autogen==0.3.2
-pip install Levenshtein
+pip install autogen==0.3.2 Levenshtein | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 # === Environment Variables ===
 export PIP_CACHE_DIR="$PIP_CACHE_DIR"
 export HF_HOME="$HF_CACHE_DIR"
 
 
-hf_login #TODO
+hf_login
 
 # === Run Script ===
 cd "$REPO_DIR"
@@ -47,7 +45,7 @@ NEW_LIMIT=1000
 GDOWN_PATH=$(find $INSTALL_DIR/miniconda3/envs/agentpoison/lib/python3.9/site-packages/ -type f -name download_folder.py 2>/dev/null)
 
 if [ -z "$GDOWN_PATH" ]; then
-  echo "❌ Could not find download_folder.py in the virtual environment."
+  echo "Could not find download_folder.py in the virtual environment."
   exit 1
 fi
 
@@ -56,9 +54,9 @@ sed -i.bak "s/^MAX_NUMBER_FILES = [0-9]\+/MAX_NUMBER_FILES = $NEW_LIMIT/" "$GDOW
 
 # Check if the change was successful
 if grep -q "MAX_NUMBER_FILES = $NEW_LIMIT" "$GDOWN_PATH"; then
-  echo "✅ MAX_NUMBER_FILES successfully updated to $NEW_LIMIT in $GDOWN_PATH"
+  echo "MAX_NUMBER_FILES successfully updated to $NEW_LIMIT in $GDOWN_PATH"
 else
-  echo "⚠️ Failed to update MAX_NUMBER_FILES."
+  echo "Failed to update MAX_NUMBER_FILES."
 fi
 
 
@@ -67,13 +65,13 @@ fi
 cd "$REPO_DIR"
 mkdir -p "agentdriver/data"
 gdown --folder https://drive.google.com/drive/folders/1ZrSZfTlH347hNoKADY3WjN0usmK9Dgt2
-cd "$REPO_DIR/agentdriver"
 
+cd "$REPO_DIR"
 echo "Run Agent-Driver inference"
-sh ../scripts/agent_driver/run_inference.sh
+sh scripts/agent_driver/run_inference.sh
 
 echo "Run Agent-Driver evaluation for ASR-t"
-sh ../scripts/agent_driver/run_evaluation.sh
+sh scripts/agent_driver/run_evaluation.sh
 
 
 
@@ -101,9 +99,9 @@ sh ../scripts/agent_driver/run_evaluation.sh
 mkdir -p "EhrAgent/database"
 cd "$REPO_DIR/EhrAgent/database"
 gdown --folder https://drive.google.com/drive/folders/1VUHnrm1hhKzk9I_m5d8V1QhacagoHhb6
-# unzip ehragent_db.zip
-# rm ehragent_db.zip
+
 cd "$REPO_DIR"
+# cd "$REPO_DIR/EhrAgent"
 echo "Run EhrAgent/ehragent/main.py"
 python EhrAgent/ehragent/main.py --backbone gpt --model dpr --algo ap --attack
 

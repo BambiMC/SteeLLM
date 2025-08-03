@@ -8,14 +8,15 @@ source "$SCRIPT_DIR/../ressources/utils.sh"
 parse_config
 
 # === CONFIGURATION ===
-# REPO_URL="https://github.com/confident-ai/deepeval.git"
-REPO_DIR="$INSTALL_DIR/MyOwn"
-CONDA_ENV_NAME="myown"
-PYTHON_VERSION="3.10" #TODO
+REPO_URL="https://github.com/BambiMC/JailbreakScan.git"
+REPO_DIR="$INSTALL_DIR/JailbreakScan"
+CONDA_ENV_NAME="jailbreakscan"
+PYTHON_VERSION="3.10"
 
 ensure_miniconda "$INSTALL_DIR"
-# clone_repo
+clone_repo
 ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
+
 
 # === Install Requirements ===
 mkdir -p "$REPO_DIR"
@@ -38,16 +39,10 @@ hf_login
 # === Run Script ===
 cd "$REPO_DIR"
 
-#TODO gerade manuell hochgeladen, Github machen und dann die MyOwn.py commiten
-python MyOwn.py \
-  --model_name meta-llama/Llama-2-7b-chat-hf \
-  --judge_model facebook/bart-large-mnli \
-  --max_examples 10
-# python openpromptinjection.py $HF_MODEL_NAME
-
+python JailbreakScan.py --model_name ${HF_MODEL_NAME} --multi_gpu
 
 
 # === Evaluation ===
-# RESULTS="$REPO_DIR/evaluation_metrics.json" #TODO
-# cd "$SCRIPTS_DIR"
-# python openpromptinjection_eval.py $RESULTS $HF_MODEL_NAME 
+RESULTS="$REPO_DIR/jailbreak_scan_results.txt"
+cd "$SCRIPTS_DIR"
+python jailbreakscan_eval.py $RESULTS $HF_MODEL_NAME

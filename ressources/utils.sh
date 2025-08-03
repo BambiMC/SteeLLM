@@ -6,10 +6,10 @@ set -euo pipefail
 
 # Usage: parse_config
 parse_config () {
-    export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
+    # export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json) # Now done in the benchmark script(s)
     export USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
     export INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
-    export SCRIPTS_DIR=$PWD/../scripts # evtl. brauche ich das gar nicht, weil das in den Skripten schon gesetzt wird?
+    export SCRIPTS_DIR=$PWD/../scripts
     export HUGGINGFACE_API_KEY=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export OPENAI_API_KEY=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export DEEPSEEK_API_KEY=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
@@ -55,10 +55,12 @@ ensure_conda_env () {
 # Usage: clone_repo
 clone_repo () {
     if [[ ! -d "$REPO_DIR" ]]; then
+        echo "Cloning repository from $REPO_URL to $REPO_DIR ..."
         git clone "$REPO_URL" "$REPO_DIR"
         cd "$REPO_DIR"
     else
         cd "$REPO_DIR"
+        echo "Repository already exists, pulling latest changes..."
         git pull --force
     fi
 }
@@ -84,7 +86,6 @@ set_cuda_device_order_and_visible_devices() {
 # Usage: hf_login
 hf_login ()    { 
     cd $SCRIPTS_DIR
-    #TODO hat das funktioniert?, dann noch die anderen TOKEN auch exporten
     export HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -n "$HF_TOKEN" ]]; then
         huggingface-cli login --token "$HF_TOKEN" | grep -v -E '(The token has not been saved)' || true
@@ -93,6 +94,16 @@ hf_login ()    {
         exit 1
     fi
 }
+
+# Usage: old_hf_login
+old_hf_login () {
+    cd $SCRIPTS_DIR
+    export HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export HUGGINGFACE_HUB_TOKEN=HF_TOKEN
+}
+
+
+
 # Usage: openai_login
 openai_login (){ 
     cd $SCRIPTS_DIR

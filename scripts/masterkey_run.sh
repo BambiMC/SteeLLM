@@ -8,7 +8,7 @@ source "$SCRIPT_DIR/../ressources/utils.sh"
 parse_config
 
 # === CONFIGURATION ===
-REPO_URL="https://github.com/LLMSecurity/MasterKey.git"
+REPO_URL="https://github.com/BambiMC/MasterKey.git"
 REPO_DIR="$INSTALL_DIR/MasterKey"
 CONDA_ENV_NAME="masterkey"
 PYTHON_VERSION="3.10" #TODO
@@ -20,11 +20,9 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 # === Install Requirements ===
 cd $REPO_DIR
 pip install -r requirements.txt | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-pip uninstall -y openai 
-# pip install openai==0.26.5
-# pip install openai==1.2.0
-pip install openai
-pip install datasets
+pip uninstall -y openai | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install openai | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install datasets | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 
 
@@ -39,7 +37,6 @@ openai_login
 # === Run Script ===
 cd "$REPO_DIR"
 
-#TODO Fork machen und dann die benchmark.py committen, gerade nur manuell hochgeladen
 python benchmark.py $OPENAI_API_KEY gpt-4o-mini
 
 

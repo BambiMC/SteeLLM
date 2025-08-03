@@ -3,7 +3,7 @@
 START_TIME=$(date +%s)
 TIMESTAMP=$(date -d "+2 hours" +"%d%m%y_%H%M")
 
-HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
+export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
 # Split at /
 IFS='/' read -ra MODEL_NAME_PARTS <<< "$HF_MODEL_NAME"
 HF_MODEL_NAME="${MODEL_NAME_PARTS[-1]}" 
@@ -22,28 +22,29 @@ if [ "$CENTRALIZED_LOGGING" = "true" ]; then
     echo "-------------------------------------------------------------------------------------" >> centralized_results.txt
 fi
 
-cd "/home/fberger/SteeLLM/new" #TODO
+cd scripts_experimental
 
-printf "\nSTART OF AgentPoison\n"
-bash agentpoison_run.sh
+# printf "\nSTART OF AgentPoison\n"
+# bash agentpoison_run.sh
 # timeout 15m bash agentpoison_run.sh
+# FileNotFoundError: [Errno 2] No such file or directory: 'data/memory/database.pkl'
+# Error on line 71: sh scripts/agent_driver/run_inference.sh
 
 # printf "\nSTART OF BadAgent\n"
 # # bash badagent_run.sh
 # timeout 15m bash badagent_run.sh
 
-# printf "\nSTART OF BadChain\n"
-# bash badchain_run.sh
-# timeout 15m bash badchain_run.sh
-# Funktioniert und berechnet die Metriken am Ende, gibts auf der Commandline oder in log_300725_1041
+
 
 # printf "\nSTART OF BadGPT\n"
 # # bash badgpt_run.sh
 # timeout 15m bash badgpt_run.sh
 
-printf "\nSTART OF BadPrompt\n"
-bash badprompt_run.sh
+# printf "\nSTART OF BadPrompt\n"
+# bash badprompt_run.sh
 # timeout 15m bash badprompt_run.sh
+# 3 Jahre alt, zu alte Huggingface_hub library, funktioniert nicht mehr
+#TODO könnte es nochmal mit hf auth login versuchen
 
 # printf "\nSTART OF CodeBreaker\n"
 # # bash codebreaker_run.sh
@@ -53,18 +54,11 @@ bash badprompt_run.sh
 # # bash deepeval_run.sh
 # timeout 15m bash deepeval_run.sh
 
-printf "\nSTART OF MyOwn\n"
-bash MyOwn_run.sh
-# timeout 15m bash MyOwn_run.sh
 
-printf "\nSTART OF MasterKey\n"
-bash masterkey_run.sh
-# timeout 15m bash masterkey_run.sh
+# printf "\nSTART OF TAP\n"
+# timeout 15m bash tap_run.sh
+# Läuft durch, bringt aber keine Ergebnisse
 
-# printf "\nSTART OF MJP\n"
-# bash mjp_run.sh
-# timeout 15m bash mjp_run.sh
-#Die ersten 15 Minuten laufen gut durch
 
 # printf "\nSTART OF Nightshade\n"
 # # bash nightshade_run.sh
