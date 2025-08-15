@@ -3,11 +3,18 @@
 START_TIME=$(date +%s)
 TIMESTAMP=$(date -d "+2 hours" +"%d%m%y_%H%M")
 
-export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
+if [ -n "$1" ]; then
+    HF_MODEL_NAME="$1"
+else
+    HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
+fi
+export HF_MODEL_NAME
+
+
 # Split at /
 IFS='/' read -ra MODEL_NAME_PARTS <<< "$HF_MODEL_NAME"
-HF_MODEL_NAME="${MODEL_NAME_PARTS[-1]}" 
-LOG_FILE="logs/log_${TIMESTAMP}_${HF_MODEL_NAME}.txt"
+HF_MODEL_NAME_WITHOUT_PROVIDER="${MODEL_NAME_PARTS[-1]}" 
+LOG_FILE="logs/log_${TIMESTAMP}_${HF_MODEL_NAME_WITHOUT_PROVIDER}.txt"
 
 mkdir -p logs "$(dirname "$LOG_FILE")"
 exec > >(tee -a "$LOG_FILE") 2>&1
@@ -76,6 +83,7 @@ bash jailbreakscan_run.sh
 # timeout 5m bash openpromptinjection_run.sh
 
 # printf "\nSTART OF PURPLELLAMA\n"
+# bash purplellama_run.sh
 # timeout 5m bash purplellama_run.sh
 
 

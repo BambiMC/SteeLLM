@@ -50,6 +50,9 @@ function run_benchmark() {
 
 cd "$REPO_DIR"
 
+echo "Running benchmarks for model: $HF_MODEL_NAME"
+echo "Running benchmarks with LLM: $LLM"
+
 # --- MITRE ---
 run_benchmark \
    --benchmark=mitre \

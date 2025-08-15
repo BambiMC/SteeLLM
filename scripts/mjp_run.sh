@@ -9,9 +9,9 @@ parse_config
 
 # === CONFIGURATION ===
 REPO_URL="https://github.com/HKUST-KnowComp/LLM-Multistep-Jailbreak.git"
-REPO_DIR="$INSTALL_DIR/LLM-Multistep-Jailbreak" #TODO
-CONDA_ENV_NAME="llm-multistep-jailbreak" #TODO
-PYTHON_VERSION="3.10" #TODO
+REPO_DIR="$INSTALL_DIR/LLM-Multistep-Jailbreak"
+CONDA_ENV_NAME="llm-multistep-jailbreak"
+PYTHON_VERSION="3.10"
 
 ensure_miniconda "$INSTALL_DIR"
 clone_repo
