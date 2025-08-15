@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 CONDA_ENV_NAME="easyjailbreak"
@@ -30,8 +30,8 @@ hf_login
 
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export HF_HOME="$HF_CACHE_DIR"
+
+
 export HF_MODEL_NAME="llama2_7b" #TODO brauche ich das wirklich? NUR TEMPORÄR
 export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
 export CUDA_DEVICE_ORDER=PCI_BUS_ID

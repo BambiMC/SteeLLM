@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 # HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
@@ -26,8 +26,8 @@ PYTHON_VERSION="3.10"
 # export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
 export CUDA_VISIBLE_DEVICES=0  
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-export HF_HOME="$HF_CACHE_DIR"
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
+
+
 # export DATASETS="$INSTALL_DIR/CybersecurityBenchmarks/datasets"
 
 

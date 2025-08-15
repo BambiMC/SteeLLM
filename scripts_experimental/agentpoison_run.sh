@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 REPO_URL="https://github.com/BambiMC/AgentPoison.git"
@@ -24,8 +24,8 @@ pip install gdown | grep -v -E '(Requirement already satisfied|Using cached|Atte
 pip install autogen==0.3.2 Levenshtein | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export HF_HOME="$HF_CACHE_DIR"
+
+
 
 
 hf_login

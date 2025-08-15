@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 CONDA_ENV_NAME="jailbreakbench"
@@ -22,21 +22,29 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 # === Install Python Dependencies ===
 cd "$REPO_DIR"
-pip install jailbreakbench[vllm] | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-pip install -e . | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-# TODO Is this next line needed?
-# pip install transformers accelerate | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+# TODO DECOMMENT WHEN NEW ENV; ONLY TEMP COMMENT
+# pip install jailbreakbench[vllm] | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+# pip install -e . | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
+
+##### TODO Is this next line needed?
+##### pip install --upgrade transformers tokenizers | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+
+# TODO DECOMMENT WHEN NEW ENV; ONLY TEMP COMMENT
+# pip install --upgrade torch
+# pip install bitsandbytes
 
 hf_login
 
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export HF_HOME="$HF_CACHE_DIR"
+
+
 export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
-export HF_MODEL_NAME="vicuna-13b-v1.5" #TODO brauche ich das wirklich? NUR TEMPORÄR
-IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
+# export HF_MODEL_NAME="vicuna-13b-v1.5" #TODO brauche ich das wirklich? NUR TEMPORÄR
+# IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
+export CUDA_VISIBLE_DEVICES=0 #TODO Delete this for HPC
+
 
 # === Run Benchmark ===
 cd "$REPO_DIR"
@@ -45,4 +53,4 @@ python benchmark.py $HF_MODEL_NAME
 
 # === Evaluation ===
 cd $SCRIPTS_DIR
-python jailbreakbench_eval.py $REPO_DIR/benchmark_results.txt $HF_MODEL_NAME
+python jailbreakbench_eval.py $REPO_DIR $HF_MODEL_NAME

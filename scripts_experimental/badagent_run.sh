@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 REPO_URL="https://github.com/DPamK/BadAgent.git"
@@ -26,8 +26,8 @@ pip install IPython beautifulsoup4 | grep -v -E '(Requirement already satisfied|
 
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export HF_HOME="$HF_CACHE_DIR"
+
+
 
 
 hf_login

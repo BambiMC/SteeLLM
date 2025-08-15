@@ -1,28 +1,84 @@
 #!/usr/bin/env bash
-# ============================================================
-# AgentDojo utility functions — source this from any script.
-# ============================================================
-set -euo pipefail
+set -eo pipefail
+
+# Usage: benchmark_setup
+benchmark_setup() {
+
+    START_TIME=$(date +%s)
+    TIMESTAMP=$(date -d "+2 hours" +"%y%m%d_%H%M")
+
+    if [ -n "${1:-}" ]; then
+        HF_MODEL_NAME="$1"
+    else
+        HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' config.json)
+    fi
+    export HF_MODEL_NAME
+
+    TASK_TO_RUN="$2"
+
+    # Split at /
+    IFS='/' read -ra MODEL_NAME_PARTS <<< "$HF_MODEL_NAME"
+    HF_MODEL_NAME_WITHOUT_PROVIDER="${MODEL_NAME_PARTS[-1]}" 
+    LOG_FILE="logs/log_${TIMESTAMP}_${HF_MODEL_NAME_WITHOUT_PROVIDER}_${TASK_TO_RUN}.txt"
+
+    mkdir -p logs "$(dirname "$LOG_FILE")"
+    exec > >(tee -a "$LOG_FILE") 2>&1
+
+    CENTRALIZED_LOGGING=$(grep -oP '"CENTRALIZED_LOGGING"\s*:\s*\K(true|false)' config.json)
+
+    if [ "$CENTRALIZED_LOGGING" = "true" ]; then
+        echo "-------------------------------------------------------------------------------------" >> centralized_results.txt
+    fi
+
+}
+
+# Usage: benchmark_teardown
+benchmark_teardown() {
+
+    END_TIME=$(date +%s)
+    DURATION=$((END_TIME - START_TIME))
+
+    # Format duration as H:M:S
+    HOURS=$((DURATION / 3600))
+    MINUTES=$(( (DURATION % 3600) / 60 ))
+    SECONDS=$((DURATION % 60))
+
+    printf "Script execution finished. Full log saved to $LOG_FILE"
+    printf "End Time: $(date +"%Y-%m-%d %H:%M:%S")"
+    printf "Total Duration: ${HOURS}h ${MINUTES}m ${SECONDS}s"
+
+}
 
 # Usage: parse_config
 parse_config () {
-    # export HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json) # Now done in the benchmark script(s)
+
+    # If not called via benchmark, but directly:
+    if [ -n "${1:-}" ]; then
+        HF_MODEL_NAME="$1"
+    else
+        HF_MODEL_NAME=$(grep -oP '"HF_MODEL_NAME"\s*:\s*"\K[^"]+' ../config.json)
+    fi
+    export HF_MODEL_NAME
+
     export USER_DIR=$(grep -oP '"USER_DIR"\s*:\s*"\K[^"]+' ../config.json)
     export INSTALL_DIR=$(grep -oP '"INSTALL_DIR"\s*:\s*"\K[^"]+' ../config.json)
     export SCRIPTS_DIR=$PWD/../scripts
+
     export HUGGINGFACE_API_KEY=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export OPENAI_API_KEY=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export DEEPSEEK_API_KEY=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export GOOGLE_API_KEY=$(grep -oP '"GOOGLE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     export WANDB_API_KEY=$(grep -oP '"WANDB_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+
     export CENTRALIZED_LOGGING=$(grep -oP '"CENTRALIZED_LOGGING"\s*:\s*"\K[^"]+' ../config.json)
 
     export HF_CACHE_DIR="$INSTALL_DIR/.huggingface_cache"
+    export HF_HOME="$HF_CACHE_DIR"
+
     export PIP_CACHE_DIR="$INSTALL_DIR/.cache"
     export MINICONDA_PATH="$INSTALL_DIR/miniconda3"
 
     mkdir -p "$HF_CACHE_DIR" "$PIP_CACHE_DIR"
-
 }
 
 # Usage: ensure_miniconda <install_dir>
@@ -43,6 +99,14 @@ ensure_miniconda () {
         export PATH="$CONDA_HOME/bin:$PATH"
     fi
     eval "$(conda shell.bash hook)"
+
+    # Accepting the license agreement for all conda channels
+    # for channel in \
+    # https://repo.anaconda.com/pkgs/main \
+    # https://repo.anaconda.com/pkgs/r \
+    # https://repo.anaconda.com/pkgs/msys2; do
+    #     conda tos accept --override-channels --channel $channel
+    # done
 }
 
 # Usage: ensure_conda_env <name> <python_version>
@@ -88,7 +152,8 @@ hf_login ()    {
     cd $SCRIPTS_DIR
     export HF_TOKEN=$(grep -oP '"HUGGINGFACE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -n "$HF_TOKEN" ]]; then
-        huggingface-cli login --token "$HF_TOKEN" | grep -v -E '(The token has not been saved)' || true
+        # huggingface-cli login --token "$HF_TOKEN" | grep -v -E '(The token has not been saved)' || true
+        hf auth login --token "$HF_TOKEN" |& grep -v "The token has not been saved" || true
     else
         echo "huggingface missing in config.json. Please add your token."
         exit 1
@@ -105,7 +170,7 @@ old_hf_login () {
 
 
 # Usage: openai_login
-openai_login (){ 
+openai_login () { 
     cd $SCRIPTS_DIR
     OPENAI_TOKEN=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -n "$OPENAI_TOKEN" ]]; then

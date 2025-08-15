@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
@@ -30,16 +30,16 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 
 
 # === Install Python Dependencies ===
+pip uninstall -y transformers tokenizers
 pip install -r requirements.txt | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 pip install huggingface_hub deepspeed | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-
 
 hf_login
 
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
-export HF_HOME="$HF_CACHE_DIR"
+
+
 export XDG_CACHE_HOME="$XDG_CACHE_HOME"
 export DEEPSPEED_CACHE_DIR="$DEEPSPEED_CACHE_DIR"
 export NCCL_P2P_DISABLE=1

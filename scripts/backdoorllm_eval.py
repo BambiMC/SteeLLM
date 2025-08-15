@@ -31,7 +31,7 @@ metrics = [f"ASR: {success}"]
 
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 header = [
-    f"--- {BENCHMARK_NAME} - Metrics Recorded at {current_time} for model: {HF_MODEL_NAME}---"
+    f"--- {BENCHMARK_NAME} - Metrics Recorded at {current_time} for model: {HF_MODEL_NAME} ---"
 ]
 footer = [
     f"--- End of Metrics ---"

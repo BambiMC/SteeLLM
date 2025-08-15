@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 REPO_URL="https://github.com/BambiMC/Open-Prompt-Injection.git"
@@ -21,12 +21,21 @@ ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 # === Install Requirements ===
 cd $REPO_DIR
 conda env update -f environment.yml --name $CONDA_ENV_NAME | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-pip install --upgrade transformers tokenizers
+pip install --upgrade transformers tokenizers | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+pip install pillow timm mistral-common | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+
+pip uninstall -y bitsandbytes
+pip install bitsandbytes --prefer-binary
+pip install google-generativeai fastchat accelerate peft rouge datasets==2.21.0
+pip uninstall -y triton
+pip install triton==2.3.1
+
 
 # === Environment Variables ===
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
+
 export DATASETS="$REPO_DIR/CybersecurityBenchmarks/datasets"
-export HF_HOME="$HF_CACHE_DIR"
+export TORCH_COMPILE_DISABLE=1
+# export CUDA_VISIBLE_DEVICES=0 #TODO Delete this for HPC
 
 
 hf_login
@@ -35,8 +44,8 @@ hf_login
 cd "$REPO_DIR"
 echo "Run openpromptinjection.py"
 
-export TORCH_COMPILE_DISABLE=1
-python openpromptinjection.py $HF_MODEL_NAME
+# openpromptinjection.py model_name number_of_rounds
+python openpromptinjection.py $HF_MODEL_NAME 10
 
 
 # === Evaluation ===

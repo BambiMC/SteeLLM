@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 CONDA_ENV_NAME="AutoDAN"
@@ -17,8 +17,8 @@ PYTHON_VERSION="3.10"
 
 # === ENV VARIABLES ===
 export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "RTX A6000" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
-export HF_HOME="$HF_CACHE_DIR"
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
+
+
 
 ensure_miniconda "$INSTALL_DIR"
 ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"

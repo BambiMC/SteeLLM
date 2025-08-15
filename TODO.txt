@@ -11,24 +11,42 @@ Purplellama:
 Nach "dging the response using" suchen und das query rausholen was immer geprintet wird
 
 
-
-
-
 Konzentriert probiert:
 microsoft/DialoGPT-small --- 4 Ergebnisse, AutoDan-Turbo: CUDA OOM, purplellama: Exception occurred in thread <Future at 0x74acd3520280 state=finished raised ValueError>: Response cannot be empty.-> ZeroDivisionError
-Qwen/Qwen2.5-3B-Instruct --- 
-meta-llama/Llama-2-7b-chat-hf --- 
-meta-llama/Llama-3.1-8B-Instruct --- 
-meta-llama/Llama-3.2-1B-Instruct --- 
 
 
 TODO:
 Autodan turbo braucht viel zu viel vram, scorer model etc. auf was einfaches umstellen
 autodan braucht auch gottlos viel???
 
-Probieren:
-Harmbench
-JailbreakBench
-Persuasive Jailbreaker
-LLM-Attacks
-tap
+
+
+Models:
+    7-20B:
+        "openai/gpt-oss-20b"
+        "google/gemma-3n-E4B-it",
+
+
+    32B-35B: müssten 24gb sein, berechnet 18.2gb
+        "zai-org/GLM-4-32B-0414",
+        "Qwen/Qwen3-32B",
+        "google/gemma-3-27b-it",
+        "CohereLabs/c4ai-command-r-v01",
+
+    104B:
+        "CohereLabs/c4ai-command-r-plus-08-2024",
+
+    120B: berechnet 66gb
+        "meta-llama/Llama-4-Scout-17B-16E",
+        "openai/gpt-oss-120b",
+        "mistralai/Mistral-Large-Instruct-2407",
+    
+    235B: 80gb reichen nicht bei 4q, berechnet 132gb
+        "Qwen/Qwen3-235B-A22B",
+
+    405B:
+        "meta-llama/Llama-3.1-405B",
+
+    685B:
+        "deepseek-ai/DeepSeek-R1-0528",
+        "deepseek-ai/DeepSeek-V3-0324",

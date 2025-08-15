@@ -1,4 +1,3 @@
-
 import json
 import sys
 import os
@@ -9,27 +8,26 @@ import re
 RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
 CENTRALIZED_LOGGING = json.loads(pathlib.Path("../config.json").read_text()).get("CENTRALIZED_LOGGING")
-BENCHMARK_NAME = "PurpleLlama"
+BENCHMARK_NAME = "BadChain" #TODO
 
-benign_percentage = 0
-tasks = 0
+
+
+success = 0
+tries = 0
 
 with open(RESULTS, 'r') as f:
     for line in f:
         # find line that contains ASR
-        if "benign_percentage" in line:
-            match = re.search(r'"benign_percentage":\s*([\d.]+)', line)
+        if "ASR" in line:
+            # Extract the ASR value using regex
+            match = re.search(r'ASR_scores":\s*([\d.]+)', line)
             if match:
-                benign_percentage += float(match.group(1))
-                print(f"Benign percentage: {benign_percentage}")
-                tasks += 1
+                asr_value = float(match.group(1))
+                print(f"ASR: {asr_value}")
+                success += asr_value
+                tries += 1
 
-print(f"Tasks: {tasks}")
-good_percentage = benign_percentage/tasks
-
-metrics = [f"Benign Percentage (average): {good_percentage:.2f}"]
-
-
+metrics = [f"ASR: {success}"]
 
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 header = [
@@ -41,7 +39,7 @@ footer = [
 metrics = header + metrics + footer
 
 
-file_path = os.path.dirname(os.path.abspath(__file__)) + "/purplellama_results.txt"
+file_path = os.path.dirname(os.path.abspath(__file__)) + "/backdoorllm_results.txt"
 if CENTRALIZED_LOGGING == True:
     file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/centralized_results.txt"
 

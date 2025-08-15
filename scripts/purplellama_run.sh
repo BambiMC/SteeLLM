@@ -5,7 +5,7 @@ trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../ressources/utils.sh"
 
-parse_config
+parse_config "$1"
 
 # === CONFIGURATION ===
 GPU_NAME="RTX A6000"
@@ -17,8 +17,8 @@ REPO_DIR="$INSTALL_DIR/PurpleLlama"
 
 # === ENVIRONMENT ===
 export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
-export HF_HOME="$HF_CACHE_DIR"
-export PIP_CACHE_DIR="$PIP_CACHE_DIR"
+
+
 
 
 ensure_miniconda "$INSTALL_DIR"
