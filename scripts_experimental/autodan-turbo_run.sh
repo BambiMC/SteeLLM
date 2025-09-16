@@ -14,7 +14,7 @@ REPO_DIR="$INSTALL_DIR/AutoDAN-Turbo"
 PYTHON_VERSION="3.10"
 
 # === ENV VARIABLES ===
-export CUDA_VISIBLE_DEVICES=0  
+# export CUDA_VISIBLE_DEVICES=0  
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 
@@ -45,10 +45,12 @@ pip install -U bitsandbytes | grep -v -E '(Requirement already satisfied|Using c
 # echo "wandb==<your_version>" >> requirements.txt  # TODO
 
 
-hf_login
 wandb_login
+hf_login
 openai_login
 deepseek_login
+google_gemini_login
+anthropic_login
 
 
 # === Setup llm/chat_templates ===

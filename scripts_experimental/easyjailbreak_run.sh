@@ -35,7 +35,7 @@ hf_login
 export HF_MODEL_NAME="llama2_7b" #TODO brauche ich das wirklich? NUR TEMPORÄR
 export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
+# export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
 # export CUDA_VISIBLE_DEVICES=0 #Nur damit kommt der Fehler auf jeden Fall
 
 # === Run Benchmark ===

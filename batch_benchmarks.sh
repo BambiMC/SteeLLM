@@ -1,3 +1,5 @@
+# Usage: bash batch_benchmarks.sh jailbreakscan
+
 HF_MODEL_NAMES=(
         google/gemma-3-12b-it
         microsoft/phi-4
@@ -9,6 +11,18 @@ HF_MODEL_NAMES=(
         openai/gpt-oss-20b
 )
 
+testing=true
+task="$1"
+if [ -z "$task" ]; then
+  echo "Usage: $0 <task>"
+  
+  exit 1
+fi
+
 for model in "${HF_MODEL_NAMES[@]}"; do
-  timeout 15m bash run_benchmarks.sh --model "$model" --task jailbreakscan
+  if [ "$testing" = true ]; then
+    bash run_benchmarks.sh --model "$model" --task "$task" --timeout 30m
+  else
+    bash run_benchmarks.sh --model "$model" --task "$task"
+  fi
 done

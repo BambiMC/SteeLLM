@@ -105,6 +105,7 @@ TIMEOUT=${TIMEOUT:-$DEFAULT_TIMEOUT}
 source "ressources/utils.sh"
 benchmark_setup "$MODEL_NAME" "$TASK_TO_RUN"
 
+echo -e "\n"
 echo "============================================================"
 echo "  BENCHMARK RUNNER CONFIGURATION"
 echo "============================================================"

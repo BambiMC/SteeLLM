@@ -23,8 +23,8 @@ def process_results(file_path):
                     tries += 1
     return refusal, tries
 
-harmful_path = os.path.join(RESULTS_DIR, "benchmark_results_harmful.txt")
-benign_path = os.path.join(RESULTS_DIR, "benchmark_results_benign.txt")
+harmful_path = os.path.join(RESULTS_DIR, "benchmark_results_harmful_" + HF_MODEL_NAME + ".txt")
+benign_path = os.path.join(RESULTS_DIR, "benchmark_results_benign_" + HF_MODEL_NAME + ".txt")
 
 harmful_refusal, harmful_tries = process_results(harmful_path)
 benign_refusal, benign_tries = process_results(benign_path)
@@ -49,6 +49,7 @@ footer = [
 ]
 
 metrics = header + metrics + footer
+print("Metrics:\n" + "\n".join(metrics))
 
 # Determine output path
 file_path = os.path.dirname(os.path.abspath(__file__)) + "/jailbreakbench_results.txt"

@@ -24,7 +24,7 @@ PYTHON_VERSION="3.10"
 
 # === ENV VARIABLES ===
 # export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
-export CUDA_VISIBLE_DEVICES=0  
+# export CUDA_VISIBLE_DEVICES=0  
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 

@@ -69,6 +69,7 @@ footer = [
     f"--- End of Metrics ---"
 ]
 metrics = header + metrics + footer
+print("Metrics:\n" + "\n".join(metrics))
 
 
 file_path = os.path.dirname(os.path.abspath(__file__)) + "/autodan-turbo_results.txt"

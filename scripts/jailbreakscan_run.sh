@@ -23,24 +23,32 @@ mkdir -p "$REPO_DIR"
 cd $REPO_DIR
 
 pip install --upgrade transformers datasets openai accelerate bitsandbytes | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-pip install pillow timm mistral-common triton kernels | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-# pip install --upgrade kernels torch==2.6.0 | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
-# === Environment Variables ===
-# export CUDA_VISIBLE_DEVICES=0 #TODO REMOVE THESE EVERYWHERE BEFORE RUNNING ON HPC
+pip install pillow timm mistral-common triton kernels google-genai anthropic | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+
 
 
 hf_login
+openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
 
 # === Run Script ===
 cd "$REPO_DIR"
 
-#TODO make batch size is configurable
-# python JailbreakScan.py --model_name ${HF_MODEL_NAME} --multi_gpu --batch_size 8
-python JailbreakScan2.py --model_name ${HF_MODEL_NAME} --multi_gpu --batch_size 8
-# python JailbreakScan2.py --model_name ${HF_MODEL_NAME} --multi_gpu --batch_size 8
-
+# 1. python JailbreakScan.py --model_name ${HF_MODEL_NAME} --batch_size 8 --use_judge_model --harmful_system_prompt
+python JailbreakScan.py --model_name ${HF_MODEL_NAME} --batch_size 8 --use_judge_model --harmful_system_prompt --rewrite_prompts
+# 3. python JailbreakScan.py --model_name ${HF_MODEL_NAME} --batch_size 8 --use_judge_model --rewrite_prompts
+# 4. python JailbreakScan.py --model_name ${HF_MODEL_NAME} --batch_size 8
+# python JailbreakScan.py --model_name ${HF_MODEL_NAME} --batch_size 8 --use_judge_model
+# --multi_gpu  
+# --rewrite_prompts --harmful_system_prompt
+# --harmful_system_prompt
+# --rewrite_prompts
+# python JailbreakScan.py --model_name ${HF_MODEL_NAME} --multi_gpu --batch_size 32 --use_judge_model
+# python JailbreakScan.py --model_name ${HF_MODEL_NAME} --multi_gpu --batch_size 16 --max_examples 16
 
 # === Evaluation ===
 RESULTS="$REPO_DIR/jailbreak_scan_results.txt"
 cd "$SCRIPTS_DIR"
-# python jailbreakscan_eval.py $RESULTS $HF_MODEL_NAME
+python jailbreakscan_eval.py $RESULTS $HF_MODEL_NAME

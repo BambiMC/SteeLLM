@@ -35,6 +35,10 @@ pip install -r requirements.txt | grep -v -E '(Requirement already satisfied|Usi
 pip install huggingface_hub deepspeed | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 hf_login
+openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
 
 
 # === Environment Variables ===

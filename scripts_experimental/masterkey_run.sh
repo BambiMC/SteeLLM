@@ -11,7 +11,7 @@ parse_config "$1"
 REPO_URL="https://github.com/BambiMC/MasterKey.git"
 REPO_DIR="$INSTALL_DIR/MasterKey"
 CONDA_ENV_NAME="masterkey"
-PYTHON_VERSION="3.10" #TODO
+PYTHON_VERSION="3.10"
 
 ensure_miniconda "$INSTALL_DIR"
 clone_repo

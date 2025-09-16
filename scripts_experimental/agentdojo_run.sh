@@ -17,8 +17,14 @@ PYTHON_VERSION="3.11"
 # === SETUP ===
 ensure_miniconda "$INSTALL_DIR"
 ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
+
 hf_login
 openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
+
+
 clone_repo
 
 git reset --hard HEAD # Otherwise the template will not be there to be updated, if the benchmark is run multiple times (Agentdojo specific)
@@ -48,7 +54,7 @@ pip uninstall -y transformers tokenizers
 pip install --upgrade transformers tokenizers
 
 
-export CUDA_VISIBLE_DEVICES=0 #TODO Remove this before running on HPC
+# export CUDA_VISIBLE_DEVICES=0 #TODO Remove this before running on HPC
 
 AVG_UTILS=()
 

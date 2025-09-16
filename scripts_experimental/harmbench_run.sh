@@ -33,6 +33,10 @@ python -m spacy download en_core_web_sm
 
 
 hf_login
+openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
 
 
 # === Environment Variables ===
@@ -47,7 +51,7 @@ python modify_models_yaml.py "$HF_MODEL_NAME" false bfloat16 1
 # export HF_MODEL_NAME="llama2_7b"
 export MODEL_NAME="$HF_MODEL_NAME" #TODO Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
-export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
+# export CUDA_VISIBLE_DEVICES=$(nvidia-smi --query-gpu=index,name --format=csv,noheader | grep "$GPU_NAME" | cut -d',' -f1 | tr '\n' ',' | sed 's/,$//')
 
 # === Run Benchmark ===
 cd $REPO_DIR

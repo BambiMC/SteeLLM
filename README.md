@@ -1,8 +1,9 @@
 # Requirements
 
 Hardware:
-BF16 Support
-Nvidia GPU(s)
+
+- Nvidia GPU(s) (Tested with A100 40 GB)
+- BF16 Support
 
 Software:
 
@@ -72,18 +73,29 @@ This configuration file contains key settings required to set up your environmen
 - **Description:**  
   API key for accessing DeepSeek services.
 - **Example:**  
-  `ds-...`
+  `sk-...`
 - **Usage:**  
   Required only if DeepSeek models are used.
 
 ---
 
-### `GOOGLE_TODO`
+### `GOOGLE_API_KEY`
 
 - **Description:**  
-  Placeholder for Google API integration (e.g., OAuth token or API key).
+  API key for accessing Google services.
+- **Example:**  
+  `...`
 - **Usage:**  
-  Leave empty unless explicitly required for a specific integration. //TODO where is this needed?
+  Required only if Google (Gemini) models are used.
+
+### `ANTHROPIC_API_KEY`
+
+- **Description:**  
+  API key for accessing Anthropic services.
+- **Example:**  
+  `...`
+- **Usage:**  
+  Required only if Anthropic models are used.
 
 ---
 
@@ -130,7 +142,7 @@ This configuration file contains key settings required to set up your environmen
 - **Example:**  
   `meta-llama/Llama-2-7b-chat-hf`
 - **Usage:**  
-  Used to load a specific model from Hugging Face. Ensure the model is accessible via your token. //TODO compatibility restrictions with some benchmarks?
+  Used to load a specific model from Huggingface or (for Jailbreakscan) a cloud model: Supported: Openai, Anthropic, Google and Deepseek. Ensure the model is accessible via your token. //TODO compatibility restrictions with some benchmarks?
 
 ---
 

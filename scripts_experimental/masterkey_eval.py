@@ -8,7 +8,7 @@ import re
 RESULTS = sys.argv[1]
 HF_MODEL_NAME = sys.argv[2] 
 CENTRALIZED_LOGGING = json.loads(pathlib.Path("../config.json").read_text()).get("CENTRALIZED_LOGGING")
-BENCHMARK_NAME = "BadChain" #TODO
+BENCHMARK_NAME = "Masterkey" #TODO
 
 
 
@@ -37,6 +37,7 @@ footer = [
     f"--- End of Metrics ---"
 ]
 metrics = header + metrics + footer
+print("Metrics:\n" + "\n".join(metrics))
 
 
 file_path = os.path.dirname(os.path.abspath(__file__)) + "/backdoorllm_results.txt"

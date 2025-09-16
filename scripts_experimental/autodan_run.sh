@@ -24,6 +24,11 @@ ensure_miniconda "$INSTALL_DIR"
 ensure_conda_env "$CONDA_ENV_NAME" "$PYTHON_VERSION"
 clone_repo
 
+hf_login
+openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
 
 # === Install requirements ===
 if grep -q "numpy==1.26.0" requirements.txt; then

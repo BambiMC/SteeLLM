@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 trap 'echo "❌ Error on line $LINENO: $BASH_COMMAND"' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,19 +32,28 @@ cd "$REPO_DIR"
 
 # TODO DECOMMENT WHEN NEW ENV; ONLY TEMP COMMENT
 # pip install --upgrade torch
-# pip install bitsandbytes
+
+pip install bitsandbytes kernels google-genai anthropic  | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
 
 hf_login
+openai_login
+deepseek_login
+google_gemini_login
+anthropic_login
 
 
 # === Environment Variables ===
+# export CUDA_VISIBLE_DEVICES=0 #TODO Delete this for HPC
 
 
-export MODEL_NAME="$HF_MODEL_NAME" # TOFIX Bringt das was? / Aber das hier scheine ich wegen dem Fehler zu brauchen, sonst ersetzt er das generic template nicht
-# export HF_MODEL_NAME="vicuna-13b-v1.5" #TODO brauche ich das wirklich? NUR TEMPORÄR
-# IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$HF_MODEL_NAME"
-export CUDA_VISIBLE_DEVICES=0 #TODO Delete this for HPC
+export MODEL_NAME="$HF_MODEL_NAME" # Needed!
 
+
+# With Fallback if cloud model is used
+IFS='/' read -ra HF_MODEL_NAME_SPLIT <<< "$MODEL_NAME"
+HF_MODEL_NAME_SPLITTED=${HF_MODEL_NAME_SPLIT[1]:-$MODEL_NAME}
+
+echo "Using HF_MODEL_NAME_SPLITTED: $HF_MODEL_NAME_SPLITTED"
 
 # === Run Benchmark ===
 cd "$REPO_DIR"
@@ -53,4 +62,4 @@ python benchmark.py $HF_MODEL_NAME
 
 # === Evaluation ===
 cd $SCRIPTS_DIR
-python jailbreakbench_eval.py $REPO_DIR $HF_MODEL_NAME
+python jailbreakbench_eval.py $REPO_DIR $HF_MODEL_NAME_SPLITTED

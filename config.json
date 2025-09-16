@@ -1,9 +1,10 @@
 {
-    "USER_DIR": "/home/fberger",
-    "INSTALL_DIR": "/mnt/hdd-baracuda/fberger",
+    "USER_DIR": "",
+    "INSTALL_DIR": "",
     "OPENAI_API_KEY": "",
     "DEEPSEEK_API_KEY": "",
     "GOOGLE_API_KEY": "",
+    "ANTHROPIC_API_KEY": "",
     "HUGGINGFACE_API_KEY": "",
     "WANDB_API_KEY": "",
     "DEEPEVAL_API_KEY": "",
@@ -17,6 +18,10 @@
         "Qwen/Qwen3-32B",
         "CohereLabs/c4ai-command-a-03-2025",
         "microsoft/phi-4",
-        "meta-llama/Llama-3.3-70B-Instruct"
+        "meta-llama/Llama-3.3-70B-Instruct",
+        "gpt-5-nano",
+        "claude-sonnet-4-20250514",
+        "gemini-2.5-flash",
+        "deepseek-chat"
     ]
 }

@@ -1,2 +1,3 @@
-# timeout 30m bash run_benchmarks.sh --model "meta-llama/Llama-3.3-70B-Instruct" --task openpromptinjection
-timeout 30m bash run_benchmarks.sh --model "meta-llama/Llama-3.3-70B-Instruct" --task jailbreakbench
+timeout 30m bash run_benchmarks.sh --model "google/gemma-3-270m" --task jailbreakscan
+timeout 30m bash run_benchmarks.sh --model "google/gemma-3-270m" --task openpromptinjection
+timeout 30m bash run_benchmarks.sh --model "google/gemma-3-270m" --task jailbreakbench

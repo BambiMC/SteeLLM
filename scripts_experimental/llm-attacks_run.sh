@@ -15,7 +15,7 @@ PYTHON_VERSION="3.10"
 
 
 # === ENV VARIABLES ===
-export CUDA_VISIBLE_DEVICES=0  
+# export CUDA_VISIBLE_DEVICES=0 # TODO Delete this before running on HPC
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 

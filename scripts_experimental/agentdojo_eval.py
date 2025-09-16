@@ -28,6 +28,7 @@ footer = [
     f"--- End of Metrics ---"
 ]
 metrics = header + metrics + footer
+print("Metrics:\n" + "\n".join(metrics))
 
 # Determine file path
 file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "agentdojo_results.txt")

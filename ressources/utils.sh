@@ -43,9 +43,9 @@ benchmark_teardown() {
     MINUTES=$(( (DURATION % 3600) / 60 ))
     SECONDS=$((DURATION % 60))
 
-    printf "Script execution finished. Full log saved to $LOG_FILE"
-    printf "End Time: $(date +"%Y-%m-%d %H:%M:%S")"
-    printf "Total Duration: ${HOURS}h ${MINUTES}m ${SECONDS}s"
+    printf "\nScript execution finished. Full log saved to $LOG_FILE"
+    printf "\nEnd Time: $(date +"%Y-%m-%d %H:%M:%S")"
+    printf "\nTotal Duration: ${HOURS}h ${MINUTES}m ${SECONDS}s"
 
 }
 
@@ -83,7 +83,8 @@ parse_config () {
 
 # Usage: ensure_miniconda <install_dir>
 ensure_miniconda () {
-    pip install --upgrade pip | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+    # pip install --upgrade pip | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
+    python -m pip install --upgrade pip==24.2 | grep -v -E '(Requirement already satisfied|Using cached|Attempting uninstall|Collecting|Found existing installation|Successfully|)' || true
     # conda update -n base -c defaults conda # Does not work in my environment
     
     local CONDA_HOME="$INSTALL_DIR/miniconda3"
@@ -172,7 +173,7 @@ old_hf_login () {
 # Usage: openai_login
 openai_login () { 
     cd $SCRIPTS_DIR
-    OPENAI_TOKEN=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export OPENAI_TOKEN=$(grep -oP '"OPENAI_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -n "$OPENAI_TOKEN" ]]; then
         export OPENAI_API_KEY="$OPENAI_TOKEN"
     else
@@ -184,9 +185,32 @@ openai_login () {
 # Usage: deepseek_login
 deepseek_login() {
     cd $SCRIPTS_DIR
-    DEEPSEEK_TOKEN=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    export DEEPSEEK_TOKEN=$(grep -oP '"DEEPSEEK_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
     if [[ -z "$DEEPSEEK_TOKEN" ]]; then
         echo "DeepSeek token missing in config.json. Please add your token."
+        exit 1
+    fi
+}
+
+# Usage: anthropic_login
+anthropic_login() {
+    cd $SCRIPTS_DIR
+    export ANTHROPIC_TOKEN=$(grep -oP '"ANTHROPIC_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    if [[ -z "$ANTHROPIC_TOKEN" ]]; then
+        echo "Anthropic token missing in config.json. Please add your token."
+        exit 1
+    fi
+}
+
+# Usage: google_gemini_login
+google_gemini_login() {
+    cd "$SCRIPTS_DIR"
+    export GOOGLE_API_KEY=$(grep -oP '"GOOGLE_API_KEY"\s*:\s*"\K[^"]+' ../config.json)
+    
+    if [[ -n "$GOOGLE_API_KEY" ]]; then
+        export GOOGLE_API_KEY="$GOOGLE_API_KEY"
+    else
+        echo "Google API key missing in config.json. Please add your token."
         exit 1
     fi
 }
